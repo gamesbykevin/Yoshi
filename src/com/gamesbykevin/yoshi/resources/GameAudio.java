@@ -1,15 +1,15 @@
-package com.gamesbykevin.checkers.resources;
+package com.gamesbykevin.yoshi.resources;
 
 import com.gamesbykevin.framework.resources.*;
 
 /**
- * All game images
+ * All audio for game
  * @author GOD
  */
-public final class GameImages extends ImageManager
+public final class GameAudio extends AudioManager
 {
     //description for progress bar
-    private static final String DESCRIPTION = "Loading Image Resources";
+    private static final String DESCRIPTION = "Loading Audio Resources";
     
     /**
      * These are the keys used to access the resources and need to match the id in the xml file
@@ -18,9 +18,9 @@ public final class GameImages extends ImageManager
     {
     }
     
-    public GameImages() throws Exception
+    public GameAudio() throws Exception
     {
-        super(Resources.XML_CONFIG_GAME_IMAGE);
+        super(Resources.XML_CONFIG_GAME_AUDIO);
         
         //the description that will be displayed for the progress bar
         super.setProgressDescription(DESCRIPTION);

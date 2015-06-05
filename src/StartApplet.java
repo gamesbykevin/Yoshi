@@ -1,7 +1,7 @@
 import javax.swing.JApplet;
 
-import com.gamesbykevin.checkers.main.Main;
-import com.gamesbykevin.checkers.shared.Shared;
+import com.gamesbykevin.yoshi.main.Main;
+import com.gamesbykevin.yoshi.shared.Shared;
 
 /**
  * WE NEED THIS CLASS HERE FOR JAVA APPLETS OUTSIDE A PACKAGE SO IT CAN FIND THE STARTING POINT

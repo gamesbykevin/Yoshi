@@ -1,4 +1,4 @@
-package com.gamesbykevin.checkers.shared;
+package com.gamesbykevin.yoshi.shared;
 
 import java.awt.Cursor;
 import java.awt.Point;

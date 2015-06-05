@@ -1,8 +1,8 @@
-package com.gamesbykevin.checkers.shared;
+package com.gamesbykevin.yoshi.shared;
 
 import com.gamesbykevin.framework.resources.Disposable;
 
-import com.gamesbykevin.checkers.engine.Engine;
+import com.gamesbykevin.yoshi.engine.Engine;
 
 import java.awt.Graphics;
 

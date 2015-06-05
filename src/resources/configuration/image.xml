@@ -3,4 +3,8 @@
     <!--
     <image id="Background1">resources/images/game/background1.png</image>
     -->
+    
+    <image id="Background1Player">resources/images/game/background1player.png</image>
+    <image id="Background2Player">resources/images/game/background2player.png</image>
+    <image id="Spritesheet">resources/images/game/spritesheet.png</image>
 </images>

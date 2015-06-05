@@ -1,7 +1,7 @@
-package com.gamesbykevin.checkers.manager;
+package com.gamesbykevin.yoshi.manager;
 
-import com.gamesbykevin.checkers.engine.Engine;
-import com.gamesbykevin.checkers.shared.IElement;
+import com.gamesbykevin.yoshi.engine.Engine;
+import com.gamesbykevin.yoshi.shared.IElement;
 
 
 /**

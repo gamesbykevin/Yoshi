@@ -1,13 +1,14 @@
-package com.gamesbykevin.checkers.manager;
+package com.gamesbykevin.yoshi.manager;
 
 import com.gamesbykevin.framework.util.Timers;
-import com.gamesbykevin.checkers.engine.Engine;
-import com.gamesbykevin.checkers.menu.CustomMenu;
-import com.gamesbykevin.checkers.menu.CustomMenu.*;
-import com.gamesbykevin.checkers.resources.GameAudio;
-import com.gamesbykevin.checkers.resources.GameFont;
-import com.gamesbykevin.checkers.resources.GameImages;
-import com.gamesbykevin.checkers.shared.Shared;
+import com.gamesbykevin.yoshi.player.*;
+import com.gamesbykevin.yoshi.engine.Engine;
+import com.gamesbykevin.yoshi.menu.CustomMenu;
+import com.gamesbykevin.yoshi.menu.CustomMenu.*;
+import com.gamesbykevin.yoshi.resources.GameAudio;
+import com.gamesbykevin.yoshi.resources.GameFont;
+import com.gamesbykevin.yoshi.resources.GameImages;
+import com.gamesbykevin.yoshi.shared.Shared;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -21,6 +22,10 @@ import java.util.List;
  */
 public final class Manager implements IManager
 {
+    private Image image;
+    
+    private Player player;
+    
     /**
      * Constructor for Manager, this is the point where we load any menu option configurations
      * @param engine Engine for our game that contains all objects needed
@@ -35,6 +40,12 @@ public final class Manager implements IManager
     @Override
     public void reset(final Engine engine) throws Exception
     {
+        image = engine.getResources().getGameImage(GameImages.Keys.Background1Player);
+        
+        if (player == null)
+        {
+            player = new Human(engine.getResources().getGameImage(GameImages.Keys.Spritesheet));
+        }
     }
     
     /**
@@ -62,7 +73,10 @@ public final class Manager implements IManager
     @Override
     public void update(final Engine engine) throws Exception
     {
-        
+        if (player != null)
+        {
+            player.update(engine);
+        }
     }
     
     /**
@@ -72,6 +86,11 @@ public final class Manager implements IManager
     @Override
     public void render(final Graphics graphics) throws Exception
     {
+        graphics.drawImage(image, 0, 0, null);
         
+        if (player != null)
+        {
+            player.render(graphics);
+        }
     }
 }

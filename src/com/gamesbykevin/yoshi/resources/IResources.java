@@ -1,4 +1,4 @@
-package com.gamesbykevin.checkers.resources;
+package com.gamesbykevin.yoshi.resources;
 
 import com.gamesbykevin.framework.resources.Disposable;
 

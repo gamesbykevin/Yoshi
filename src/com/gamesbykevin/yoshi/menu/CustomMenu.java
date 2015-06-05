@@ -1,4 +1,4 @@
-package com.gamesbykevin.checkers.menu;
+package com.gamesbykevin.yoshi.menu;
 
 import com.gamesbykevin.framework.display.FullScreen;
 import com.gamesbykevin.framework.input.Mouse;
@@ -6,11 +6,11 @@ import com.gamesbykevin.framework.menu.*;
 import com.gamesbykevin.framework.resources.FontManager;
 import com.gamesbykevin.framework.resources.ImageManager;
 
-import com.gamesbykevin.checkers.main.Main;
-import com.gamesbykevin.checkers.engine.Engine;
-import com.gamesbykevin.checkers.resources.Resources;
-import com.gamesbykevin.checkers.shared.IElement;
-import com.gamesbykevin.checkers.shared.Shared;
+import com.gamesbykevin.yoshi.main.Main;
+import com.gamesbykevin.yoshi.engine.Engine;
+import com.gamesbykevin.yoshi.resources.Resources;
+import com.gamesbykevin.yoshi.shared.IElement;
+import com.gamesbykevin.yoshi.shared.Shared;
 
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;

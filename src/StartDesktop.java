@@ -1,5 +1,5 @@
-import com.gamesbykevin.checkers.main.Main;
-import com.gamesbykevin.checkers.shared.Shared;
+import com.gamesbykevin.yoshi.main.Main;
+import com.gamesbykevin.yoshi.shared.Shared;
 
 import java.awt.Dimension;
 import java.awt.event.*;

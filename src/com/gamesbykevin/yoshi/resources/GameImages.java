@@ -1,23 +1,29 @@
-package com.gamesbykevin.checkers.resources;
+package com.gamesbykevin.yoshi.resources;
 
-import com.gamesbykevin.framework.resources.FontManager;
+import com.gamesbykevin.framework.resources.*;
 
-public final class GameFont extends FontManager
+/**
+ * All game images
+ * @author GOD
+ */
+public final class GameImages extends ImageManager
 {
     //description for progress bar
-    private static final String DESCRIPTION = "Loading Font Resources";
+    private static final String DESCRIPTION = "Loading Image Resources";
     
     /**
      * These are the keys used to access the resources and need to match the id in the xml file
      */
     public enum Keys
     {
-        Default, 
+        Background1Player, Background2Player,
+        Spritesheet
+        
     }
     
-    public GameFont() throws Exception
+    public GameImages() throws Exception
     {
-        super(Resources.XML_CONFIG_GAME_FONT);
+        super(Resources.XML_CONFIG_GAME_IMAGE);
         
         //the description that will be displayed for the progress bar
         super.setProgressDescription(DESCRIPTION);

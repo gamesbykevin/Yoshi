@@ -1,10 +1,10 @@
-package com.gamesbykevin.checkers.engine;
+package com.gamesbykevin.yoshi.engine;
 
-import com.gamesbykevin.checkers.resources.Resources;
-import com.gamesbykevin.checkers.main.Main;
-import com.gamesbykevin.checkers.manager.Manager;
-import com.gamesbykevin.checkers.menu.CustomMenu;
-import com.gamesbykevin.checkers.shared.Shared;
+import com.gamesbykevin.yoshi.resources.Resources;
+import com.gamesbykevin.yoshi.main.Main;
+import com.gamesbykevin.yoshi.manager.Manager;
+import com.gamesbykevin.yoshi.menu.CustomMenu;
+import com.gamesbykevin.yoshi.shared.Shared;
 
 import com.gamesbykevin.framework.input.*;
 

@@ -1,6 +1,6 @@
-package com.gamesbykevin.checkers.engine;
+package com.gamesbykevin.yoshi.engine;
 
-import com.gamesbykevin.checkers.main.Main;
+import com.gamesbykevin.yoshi.main.Main;
 
 import com.gamesbykevin.framework.resources.Disposable;
 

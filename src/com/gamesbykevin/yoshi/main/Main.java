@@ -1,12 +1,12 @@
-package com.gamesbykevin.checkers.main;
+package com.gamesbykevin.yoshi.main;
 
 import java.awt.*;
 import javax.swing.*;
 
 import com.gamesbykevin.framework.resources.Disposable;
 
-import com.gamesbykevin.checkers.engine.Engine;
-import com.gamesbykevin.checkers.shared.Shared;
+import com.gamesbykevin.yoshi.engine.Engine;
+import com.gamesbykevin.yoshi.shared.Shared;
 
 public final class Main extends Thread implements Disposable
 {
