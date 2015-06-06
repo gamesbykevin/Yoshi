@@ -22,8 +22,10 @@ import java.util.List;
  */
 public final class Manager implements IManager
 {
+    //background image to display
     private Image image;
     
+    //the player playing the game
     private Player player;
     
     /**
@@ -40,12 +42,17 @@ public final class Manager implements IManager
     @Override
     public void reset(final Engine engine) throws Exception
     {
-        image = engine.getResources().getGameImage(GameImages.Keys.Background1Player);
+        this.image = engine.getResources().getGameImage(GameImages.Keys.Background1Player);
         
-        if (player == null)
+        if (this.player == null)
         {
-            player = new Human(engine.getResources().getGameImage(GameImages.Keys.Spritesheet));
+            this.player = new Human(engine.getResources().getGameImage(GameImages.Keys.Spritesheet));
         }
+    }
+    
+    public Player getPlayer()
+    {
+        return this.player;
     }
     
     /**

@@ -26,7 +26,7 @@ public final class Human extends Player
     @Override
     public void render(final Graphics graphics) throws Exception
     {
-        //render the board
-        super.getBoard().render(graphics);
+        //render board
+        super.render(graphics);
     }
 }

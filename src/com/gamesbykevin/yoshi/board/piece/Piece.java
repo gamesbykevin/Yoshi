@@ -5,6 +5,7 @@ import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.util.Timers;
 
 import com.gamesbykevin.yoshi.board.Board;
+import com.gamesbykevin.yoshi.board.BoardHelper;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -125,10 +126,10 @@ public final class Piece extends Sprite
     public void applyGravity()
     {
         //set row
-        setRow(getRow() + Board.ROW_DROP);
+        setRow(getRow() + BoardHelper.ROW_DROP);
         
         //update y-coordinate
-        setY(getY() + Board.DROP_PIXEL_DISTANCE);
+        setY(getY() + BoardHelper.DROP_PIXEL_DISTANCE);
     }
     
     /**

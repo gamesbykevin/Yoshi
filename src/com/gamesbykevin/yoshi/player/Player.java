@@ -3,6 +3,7 @@ package com.gamesbykevin.yoshi.player;
 import com.gamesbykevin.yoshi.board.Board;
 import com.gamesbykevin.yoshi.shared.IElement;
 
+import java.awt.Graphics;
 import java.awt.Image;
 
 /**
@@ -16,14 +17,15 @@ public abstract class Player implements IElement
     
     public Player(final Image image)
     {
-        this.board = new Board(image);
+        this.board = new Board();
+        this.board.setImage(image);
     }
     
     /**
      * Get the player's game board
      * @return 
      */
-    protected Board getBoard()
+    public Board getBoard()
     {
         return this.board;
     }
@@ -36,5 +38,11 @@ public abstract class Player implements IElement
             board.dispose();
             board = null;
         }
+    }
+    
+    @Override
+    public void render(final Graphics graphics) throws Exception
+    {
+        getBoard().render(graphics);
     }
 }
