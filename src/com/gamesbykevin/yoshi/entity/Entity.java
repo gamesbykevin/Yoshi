@@ -80,6 +80,23 @@ public abstract class Entity extends Sprite
      */
     protected void addAnimation(final Object key, final int x, final int y, final int w, final int h, final int count, final long delay, final boolean loop)
     {
+        addAnimation(key, x, y, w, h, count, delay, delay, loop);
+    }
+    
+    /**
+     * Add animation to sprite sheet
+     * @param key Object used to identify the animation
+     * @param x starting x-coordinate of animation
+     * @param y starting y-coordinate of animation
+     * @param w width of animation
+     * @param h height of animation
+     * @param count number of animations
+     * @param delay time delay for each animation (nanoseconds)
+     * @param lastDelay time delay for last animation frame (nanoseconds)
+     * @param loop do we loop animation
+     */
+    protected void addAnimation(final Object key, final int x, final int y, final int w, final int h, final int count, final long delay, final long lastDelay, final boolean loop)
+    {
         //create a new animation
         Animation animation = new Animation();
         
@@ -89,7 +106,8 @@ public abstract class Entity extends Sprite
         //add all the animations
         for (int i=0; i < count; i++)
         {
-            animation.add(x + (i * w), y, w, h, delay);
+            //set correct delay depending on the index
+            animation.add(x + (i * w), y, w, h, (i < count - 1) ? delay : lastDelay);
         }
         
         //add animation to spritesheet

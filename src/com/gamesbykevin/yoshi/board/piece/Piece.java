@@ -53,7 +53,20 @@ public final class Piece extends Entity
     private static final long DELAY_DESTROY = Timers.toNanoSeconds(300L);
     
     //how long the yoshi create animation lasts
-    private static final long DELAY_YOSHI_CREATE = Timers.toNanoSeconds(166L);
+    private static final long DELAY_YOSHI_CREATE = Timers.toNanoSeconds(200L);
+    
+    //how long the final animation will be
+    private static final long DELAY_YOSHI_CREATE_LAST = Timers.toNanoSeconds(500L);
+    
+    /**
+     * The speed at which we switch columns
+     */
+    public static final double SWAP_COLUMN_RATE = .1;
+    
+    /**
+     * For when we aren't looking for a piece by the id
+     */
+    public static final long NO_ID = -1;
     
     //the type of piece (goomba, plant, shell top, etc...)
     private final int type;
@@ -72,6 +85,9 @@ public final class Piece extends Entity
     
     //the yoshi size
     private int size = 0;
+    
+    //the target column, used when switching columns
+    private int targetCol = 0;
     
     public Piece(final int type)
     {
@@ -123,16 +139,43 @@ public final class Piece extends Entity
                 addAnimation(ANIMATION_KEY_DESTROYED, 176, 768, 44, 32, 1, DELAY_DESTROY, false);
                 
                 //the animations for each differnt yoshi 
-                addAnimation(ANIMATION_KEY_CREATE_YOSHI_TINY,   0, 470, 44, 42, 6, DELAY_YOSHI_CREATE, false);
-                addAnimation(ANIMATION_KEY_CREATE_YOSHI_SMALL,  0, 512, 44, 55, 6, DELAY_YOSHI_CREATE, false);
-                addAnimation(ANIMATION_KEY_CREATE_YOSHI_MEDIUM, 0, 567, 55, 61, 6, DELAY_YOSHI_CREATE, false);
-                addAnimation(ANIMATION_KEY_CREATE_YOSHI_LARGE,  0, 628, 63, 81, 6, DELAY_YOSHI_CREATE, false);
+                addAnimation(ANIMATION_KEY_CREATE_YOSHI_TINY,   0, 470, 44, 42, 6, DELAY_YOSHI_CREATE, DELAY_YOSHI_CREATE_LAST, false);
+                addAnimation(ANIMATION_KEY_CREATE_YOSHI_SMALL,  0, 512, 44, 55, 6, DELAY_YOSHI_CREATE, DELAY_YOSHI_CREATE_LAST, false);
+                addAnimation(ANIMATION_KEY_CREATE_YOSHI_MEDIUM, 0, 567, 55, 61, 6, DELAY_YOSHI_CREATE, DELAY_YOSHI_CREATE_LAST, false);
+                addAnimation(ANIMATION_KEY_CREATE_YOSHI_LARGE,  0, 628, 63, 81, 6, DELAY_YOSHI_CREATE, DELAY_YOSHI_CREATE_LAST, false);
                 break;
                 
         }
         
         //assign the default animation
         setAnimation(ANIMATION_KEY_FALLING);
+    }
+    
+    /**
+     * Set the target column
+     * @param targetCol The column we want the piece to head towards (when switching columns
+     */
+    public void setTargetCol(final int targetCol)
+    {
+        this.targetCol = targetCol;
+    }
+    
+    /**
+     * Do we have the target column?
+     * @return true if the current column equals the target column
+     */
+    public boolean hasTargetCol()
+    {
+        return (getCol() == getTargetCol());
+    }
+    
+    /**
+     * Get the target column
+     * @return The column we want the piece to be at
+     */
+    public int getTargetCol()
+    {
+        return this.targetCol;
     }
     
     /**

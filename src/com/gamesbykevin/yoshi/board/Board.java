@@ -31,15 +31,20 @@ public final class Board extends Sprite implements IElement
     private Timer timer;
     
     //the amount of time to wait to apply gravity
-    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(250L);
+    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(400L);
     
     /**
      * The amount of time at which we apply gravity when we have a yoshi
      */
-    protected static final long DELAY_GRAVITY_YOSHI = Timers.toNanoSeconds(200L);
+    protected static final long DELAY_GRAVITY_YOSHI = Timers.toNanoSeconds(150L);
     
     //do we have a losing board
     private boolean lose = false;
+    
+    /**
+     * The starting coordinates where the pieces spawn on the board
+     */
+    private int startPieceColumnX, startPieceRowY;
     
     public Board()
     {
@@ -51,6 +56,46 @@ public final class Board extends Sprite implements IElement
         
         //create timer 
         this.timer = new Timer(DELAY_GRAVITY);
+    }
+    
+    /**
+     * Get the x-coordinate for the first column on the board.<br>
+     * This is used to determine where to spawn pieces
+     * @return The x-coordinate
+     */
+    protected int getStartPieceColumnX()
+    {
+        return this.startPieceColumnX;
+    }
+    
+    /**
+     * Get the y-coordinate for the first row on the board.<br>
+     * This is used to determine where to spawn pieces
+     * @return The y-coordinate
+     */
+    protected int getStartPieceRowY()
+    {
+        return this.startPieceRowY;
+    }
+    
+    /**
+     * Set the x-coordinate for the first column on the board.<br>
+     * This is used to determine where the pieces are spawned
+     * @param startPieceColumnX The x-coordinate
+     */
+    public void setStartPieceColumnX(final int startPieceColumnX)
+    {
+        this.startPieceColumnX = startPieceColumnX;
+    }
+    
+    /**
+     * Set the y-coordinate for the first row on the board.<br>
+     * This is the row where pieces are spawned
+     * @param startPieceRowY The y-coordinate
+     */
+    public void setStartPieceRowY(final int startPieceRowY)
+    {
+        this.startPieceRowY = startPieceRowY;
     }
     
     /**
@@ -91,6 +136,9 @@ public final class Board extends Sprite implements IElement
      */
     public void add(final Piece piece)
     {
+        //set the current column as the target
+        piece.setTargetCol((int)piece.getCol());
+        
         //add the piece to our list
         getPieces().add(piece);
     }
@@ -119,16 +167,6 @@ public final class Board extends Sprite implements IElement
     }
     
     /**
-     * Do we have a piece at this location?
-     * @param piece The piece that has the location we want to check
-     * @return true if a piece exists on the board at this location, false otherwise
-     */
-    protected boolean hasPiece(final Piece piece)
-    {
-        return (getPiece(piece) != null);
-    }
-    
-    /**
      * Get the piece at the specified piece location.<br>
      * We will not ignore the specified piece to check if another piece also exists at the same location
      * @param piece The piece whose location we want to check
@@ -136,38 +174,30 @@ public final class Board extends Sprite implements IElement
      */
     protected Piece getPiece(final Piece piece)
     {
-        //check all pieces to see if they are at the location
-        for (int i = 0; i < getPieces().size(); i++)
-        {
-            //get the current piece
-            final Piece tmp = getPieces().get(i);
-            
-            //we don't want to check our own piece
-            if (tmp.getId() != piece.getId())
-            {
-                //if the current piece has this location, return true
-                if (tmp.equals(piece))
-                    return tmp;
-            }
-        }
-        
-        //none were found, return null
-        return null;
+        return getPiece(piece.getCol(), piece.getRow(), piece.getId());
     }
     
     /**
      * Get the piece at the location.
      * @param col Column
      * @param row Row
-     * @return The at the specified location. If not found null is returned.
+     * @param id The unique key identifying the piece we don't want to check
+     * @return The piece at the specified location. If not found null is returned.
      */
-    protected Piece getPiece(final double col, final double row)
+    public Piece getPiece(final double col, final double row, final long id)
     {
         for (int i = 0; i < getPieces().size(); i++)
         {
-            //if the location matches, get the piece
-            if (getPieces().get(i).equals(col, row))
-                return getPieces().get(i);
+            //get the current piece
+            final Piece piece = getPieces().get(i);
+            
+            //make sure we aren't checking our own piece
+            if (piece.getId() != id)
+            {
+                //if the location matches, get the piece
+                if (piece.equals(col, row))
+                    return piece;
+            }
         }
         
         //a piece was not found return null
@@ -175,20 +205,32 @@ public final class Board extends Sprite implements IElement
     }
     
     /**
-     * Make the timer expire so gravity can be applied
+     * Make the timer expire so gravity can be applied.<br>
+     * Note: if the player can't swap the columns, gravity won't be applied
      */
     public void applyGravity()
     {
-        getTimer().setRemaining(Entity.DELAY_NONE);
+        //if we can swap columns, we can also apply gravity
+        if (BoardHelper.canSwapColumns(getPieces()))
+            getTimer().setRemaining(Entity.DELAY_NONE);
     }
     
     /**
-     * Did we lose
+     * Did we lose?
      * @return true if the board has filled up and the game is over, false otherwise
      */
     public boolean hasLost()
     {
         return this.lose;
+    }
+    
+    /**
+     * Is the game over for this board?
+     * @param lose true=yes, false=no
+     */
+    private void setLose(final boolean lose)
+    {
+        this.lose = lose;
     }
     
     @Override
@@ -202,7 +244,7 @@ public final class Board extends Sprite implements IElement
         if (!BoardHelper.hasStartingPieces(getPieces()))
         {
             //if no pieces at the top, spawn some
-            BoardHelper.spawnPieces(engine);
+            BoardHelper.spawnPieces(this, engine.getRandom());
             
             //no need to continue
             return;
@@ -223,6 +265,16 @@ public final class Board extends Sprite implements IElement
         {
             //if we have a destroyed piece pause everything else
             BoardHelper.manageDestroyedPieces(this, engine.getMain().getTime());
+            
+            //no need to continue
+            return;
+        }
+        
+        //if we have pieces needing to be swapped
+        if (BoardHelper.isSwappingColumns(getPieces()))
+        {
+            //swap the pieces that are not yet at the target column
+            BoardHelper.swapPieces(getPieces(), getStartPieceColumnX());
             
             //no need to continue
             return;
@@ -265,9 +317,11 @@ public final class Board extends Sprite implements IElement
              */
             for (int i = 0; i < getPieces().size(); i++)
             {
-                //if we have a yoshi, don't continue here
+                //we only want to create 1 yoshi at a time, so if 1 is found we will exit
                 if (BoardHelper.hasYoshi(getPieces()))
+                {
                     break;
+                }
                 
                 //get the current piece
                 final Piece piece = getPieces().get(i);
@@ -278,7 +332,7 @@ public final class Board extends Sprite implements IElement
         }
         
         //check if we have a losing board
-        lose = BoardHelper.hasLosingBoard(getPieces());
+        setLose(BoardHelper.hasLosingBoard(getPieces()));
     }
     
     @Override

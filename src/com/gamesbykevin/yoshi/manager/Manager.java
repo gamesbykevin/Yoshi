@@ -44,13 +44,12 @@ public final class Manager implements IManager
     {
         this.image = engine.getResources().getGameImage(GameImages.Keys.Background1Player);
         
+        final boolean multiplayer = false;
+        
         if (this.player == null)
         {
-            this.player = new Human(
-                engine.getResources().getGameImage(GameImages.Keys.Spritesheet),
-                Player.SINGLE_PLAYER_START_X,
-                Player.SINGLE_PLAYER_START_Y
-                );
+            //create a new player
+            this.player = new Human(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer);
         }
     }
     

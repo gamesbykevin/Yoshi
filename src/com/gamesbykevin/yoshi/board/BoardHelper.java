@@ -1,11 +1,11 @@
 package com.gamesbykevin.yoshi.board;
 
 import com.gamesbykevin.yoshi.board.piece.Piece;
-import com.gamesbykevin.yoshi.engine.Engine;
 
+import java.awt.Point;
 import java.util.ArrayList;
-
 import java.util.List;
+import java.util.Random;
 
 /**
  * This class will contain custom methods to help the board
@@ -23,38 +23,45 @@ public final class BoardHelper
     public static final int COLUMN_3 = 2;
     public static final int COLUMN_4 = 3;
     
+    /**
+     * The amount of pixels between each column
+     */
+    public static final int COLUMN_PIXEL_WIDTH = 60;
+    
     /*
      * The x-coordinates for each column single player
      */
     public static final int SINGLE_PLAYER_COLUMN_1_X = 220;
-    public static final int SINGLE_PLAYER_COLUMN_2_X = 280;
-    public static final int SINGLE_PLAYER_COLUMN_3_X = 340;
-    public static final int SINGLE_PLAYER_COLUMN_4_X = 400;
     
     //the starting y-coordinate
     public static final int SINGLE_PLAYER_ROW_1_Y = 55;
     
     /**
+     * The location of the center of the playable board in single player
+     */
+    public static final Point SINLGE_PLAYER_BOARD_CENTER = new Point(310,237);
+    
+    /**
      * The x-coordinates for each column for player 1 in multi-player
      */
     public static final int MULTI_PLAYER_1_COLUMN_1_X = 80;
-    public static final int MULTI_PLAYER_1_COLUMN_2_X = 140;
-    public static final int MULTI_PLAYER_1_COLUMN_3_X = 200;
-    public static final int MULTI_PLAYER_1_COLUMN_4_X = 260;
     
     //the starting y-coordinate
     public static final int MULTI_PLAYER_1_ROW_1_Y = 75;
+    
+    //the center of the board for player 1
+    public static final Point MULTI_PLAYER_1_BOARD_CENTER = new Point(170,260);
     
     /**
      * The x-coordinates for each column for player 2 in multi-player
      */
     public static final int MULTI_PLAYER_2_COLUMN_1_X = 380;
-    public static final int MULTI_PLAYER_2_COLUMN_2_X = 440;
-    public static final int MULTI_PLAYER_2_COLUMN_3_X = 500;
-    public static final int MULTI_PLAYER_2_COLUMN_4_X = 560;
     
     //the starting y-coordinate
     public static final int MULTI_PLAYER_2_ROW_1_Y = 75;
+    
+    //the center of the board for player 2
+    public static final Point MULTI_PLAYER_2_BOARD_CENTER = new Point(470,260);
     
     //the amount of pixels to drop for everytime we apply gravity to a piece
     public static final int DROP_PIXEL_DISTANCE = 20;
@@ -138,14 +145,12 @@ public final class BoardHelper
     }
     
     /**
-     * Spawn pieces on the board
-     * @param engine Object containing all needed game elements
-     * @throws Exception if an un-expected column is chosen
+     * Spawn pieces on the board.<br>
+     * @param board The board we want to add the pieces to
+     * @param random Object used to make random decisions
      */
-    public static void spawnPieces(final Engine engine) throws Exception
+    public static void spawnPieces(final Board board, final Random random)
     {
-        final Board board = engine.getManager().getPlayer().getBoard();
-        
         //the optional columns to choose from
         final List<Integer> options = new ArrayList<>();
         
@@ -158,16 +163,16 @@ public final class BoardHelper
         for (int i = 0 ; i < SPAWN_TOTAL; i++)
         {
             //create a new random piece
-            Piece piece = new Piece(engine.getRandom().nextInt(Piece.TYPE_TOTAL));
+            Piece piece = new Piece(random.nextInt(Piece.TYPE_TOTAL));
 
             //freeze for now
             piece.setFrozen(true);
 
             //set starting y-coordinate
-            piece.setY(BoardHelper.SINGLE_PLAYER_ROW_1_Y);
+            piece.setY(board.getStartPieceRowY());
 
             //pick random index from optional column list
-            final int index = engine.getRandom().nextInt(options.size());
+            final int index = random.nextInt(options.size());
             
             //get random column
             final int col = options.get(index);
@@ -178,32 +183,162 @@ public final class BoardHelper
             //set the column
             piece.setCol(col);
 
-            //setup accordingly
-            switch (col)
-            {
-                case BoardHelper.COLUMN_1:
-                    piece.setX(BoardHelper.SINGLE_PLAYER_COLUMN_1_X);
-                    break;
-
-                case BoardHelper.COLUMN_2:
-                    piece.setX(BoardHelper.SINGLE_PLAYER_COLUMN_2_X);
-                    break;
-
-                case BoardHelper.COLUMN_3:
-                    piece.setX(BoardHelper.SINGLE_PLAYER_COLUMN_3_X);
-                    break;
-
-                case BoardHelper.COLUMN_4:
-                    piece.setX(BoardHelper.SINGLE_PLAYER_COLUMN_4_X);
-                    break;
-                    
-                default:
-                    throw new Exception("Unexpected column chosen " + col);
-            }
+            //set the x-coordinate
+            piece.setX(board.getStartPieceColumnX() + (col * BoardHelper.COLUMN_PIXEL_WIDTH));
 
             //add piece to list
             board.add(piece);
         }
+    }
+    
+    /**
+     * Can we swap columns?<br>
+     * @param pieces The list of pieces to check
+     * @return true if there are: no yoshi's, no destroyed pieces, and we aren't already swapping columns, otherwise false is returned
+     */
+    public static boolean canSwapColumns(final List<Piece> pieces)
+    {
+        //if we have yoshi we can't swap columns
+        if (hasYoshi(pieces))
+            return false;
+        
+        //if we are currently swapping columns, we can't do it again
+        if (isSwappingColumns(pieces))
+            return false;
+        
+        //if we currently have destroyed pieces
+        if (hasDestroyedPiece(pieces))
+            return false;
+        
+        //if none of the above are an issue we can swap columns
+        return true;
+    }
+    
+    /**
+     * Are we swapping columns?
+     * @param pieces List of pieces we want to check
+     * @return true if at least 1 piece is not at the target column, false otherwise
+     */
+    public static boolean isSwappingColumns(final List<Piece> pieces)
+    {
+        for (int i = 0; i < pieces.size(); i++)
+        {
+            //get the current piece
+            final Piece piece = pieces.get(i);
+            
+            //if we are not at our target column, we are swapping columns
+            if (!piece.hasTargetCol())
+                return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Start swapping the pieces in the specified columns.<br>
+     * We won't swap them yet, but will set the target column
+     * @param board The board where the pieces are
+     * @param leftCol The left column we want to swap with the right
+     * @param rightCol The right column we want to swap with the left
+     */
+    public static void startSwap(final Board board, final int leftCol, final int rightCol)
+    {
+        for (int i = 0; i < board.getPieces().size(); i++)
+        {
+            //get the current piece
+            final Piece piece = board.getPieces().get(i);
+            
+            //don't check frozen pieces
+            if (piece.isFrozen())
+                continue;
+            
+            //if the piece is falling, check if we should swap it
+            if (!piece.isFrozen() && !piece.isPlaced())
+            {
+                //depending on the side we need to check if the falling piece should be swapped
+                if (piece.getCol() == rightCol)
+                {
+                    //get the neighbor piece
+                    final Piece tmp = board.getPiece(leftCol, (int)piece.getRow(), piece.getId());
+                    
+                    //if a piece exists next to this piece and is placed, we need to swap
+                    if (tmp != null && tmp.isPlaced())
+                        piece.setTargetCol(leftCol);
+                }
+                else if (piece.getCol() == leftCol)
+                {
+                    //get the neighbor piece
+                    final Piece tmp = board.getPiece(rightCol, (int)piece.getRow(), piece.getId());
+                    
+                    //if a piece exists next to this piece and is placed, we need to swap
+                    if (tmp != null && tmp.isPlaced())
+                        piece.setTargetCol(rightCol);
+                }
+            }
+            else
+            {
+                //set target column depending on our current location
+                if (piece.getCol() == rightCol)
+                {
+                    piece.setTargetCol(leftCol);
+                }
+                else if (piece.getCol() == leftCol)
+                {
+                    piece.setTargetCol(rightCol);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Swap the pieces.<br>
+     * Move the piece's column towards the target column
+     * @param pieces The pieces we want to swap
+     * @param startColumnX The x-coordinate where the first column is. We need to calculate the x-coordinate.
+     */
+    public static void swapPieces(final List<Piece> pieces, final double startColumnX)
+    {
+        for (int i = 0; i < pieces.size(); i++)
+        {
+            //get the current piece
+            final Piece piece = pieces.get(i);
+            
+            //only check pieces not at the target col
+            if (piece.hasTargetCol())
+                continue;
+            
+            //swap the piece
+            swapPiece(piece, startColumnX);
+        }
+        
+    }
+    
+    /**
+     * Swap the piece.<br>
+     * Move the piece's column towards the target column
+     * @param piece The piece we want to swap
+     * @param startColumnX The x-coordinate where the first column is. We need to calculate the x-coordinate.
+     */
+    public static void swapPiece(final Piece piece, final double startColumnX)
+    {
+        //get the difference
+        final double difference = (piece.getCol() > piece.getTargetCol()) ? piece.getCol() - piece.getTargetCol() : piece.getTargetCol() - piece.getCol();
+        
+        //if we are close enough to the target, place on target column
+        if (difference <= Piece.SWAP_COLUMN_RATE)
+            piece.setCol(piece.getTargetCol());
+        
+        if (piece.getCol() < piece.getTargetCol())
+        {
+            piece.setCol(piece.getCol() + Piece.SWAP_COLUMN_RATE);
+        }
+        else if (piece.getCol() > piece.getTargetCol())
+        {
+            piece.setCol(piece.getCol() - Piece.SWAP_COLUMN_RATE);
+        }
+        
+        //update x-coordinate accordingly
+        piece.setX(startColumnX + (piece.getCol() * COLUMN_PIXEL_WIDTH));
     }
     
     /**
@@ -290,7 +425,7 @@ public final class BoardHelper
         for (int row = (int)placedPiece.getRow(); row < Board.ROWS; row++)
         {
             //get the piece at this location
-            final Piece piece = board.getPiece(placedPiece.getCol(), row);
+            final Piece piece = board.getPiece(placedPiece.getCol(), row, Piece.NO_ID);
 
             //if piece doesn't exist
             if (piece == null)
@@ -330,7 +465,7 @@ public final class BoardHelper
                     for (int tmpRow = startRow; tmpRow <= row; tmpRow++)
                     {
                         //mark as yoshi and set the yoshi size
-                        board.getPiece(placedPiece.getCol(), tmpRow).markYoshi((row - startRow) + 1);
+                        board.getPiece(placedPiece.getCol(), tmpRow, Piece.NO_ID).markYoshi((row - startRow) + 1);
                     }
 
                     //now skip to the next column, since any further rows won't be part
@@ -460,26 +595,20 @@ public final class BoardHelper
         //do we apply gravity
         if (applyGravity)
         {
-            //store original row
-            final double row = piece.getRow();
-
-            //move the row down 1
-            piece.setRow(row + 1);
-
             //temporary piece used to check the piece below
             Piece tmp;
             
-            //if we are out of bounds or hit another piece, we will handle accordingly
-            if (!board.hasBounds(piece.getCol(), row + BoardHelper.ROW_DROP) || board.hasPiece(piece))
+            /**
+             * If we went out of bounds or landed on another piece, handle accordingly
+             */
+            if (!board.hasBounds(piece.getCol(), piece.getRow() + BoardHelper.ROW_DROP) || 
+                board.getPiece(piece.getCol(), (int)piece.getRow() + 1, piece.getId()) != null)
             {
-                //reset previous location
-                piece.setRow(row);
-
                 //place the piece
                 piece.placePiece();
 
                 //check the piece below (if exists)
-                tmp = board.getPiece(piece.getCol(), piece.getRow() + 1);
+                tmp = board.getPiece(piece.getCol(), (int)piece.getRow() + 1, piece.getId());
 
                 //if there is a piece below
                 if (tmp != null)
@@ -520,9 +649,6 @@ public final class BoardHelper
             }
             else
             {
-                //reset previous location
-                piece.setRow(row);
-
                 //drop piece
                 piece.applyGravity();
             }

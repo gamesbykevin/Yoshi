@@ -2,6 +2,7 @@ package com.gamesbykevin.yoshi.player;
 
 import com.gamesbykevin.framework.util.Timers;
 import com.gamesbykevin.yoshi.board.Board;
+import com.gamesbykevin.yoshi.board.BoardHelper;
 import com.gamesbykevin.yoshi.engine.Engine;
 import com.gamesbykevin.yoshi.entity.Entity;
 import com.gamesbykevin.yoshi.shared.IElement;
@@ -13,14 +14,14 @@ import java.awt.Image;
  * The player that plays the board
  * @author GOD
  */
-public abstract class Player extends Entity implements IElement
+public abstract class Player extends Entity implements IElement, IPlayer
 {
     //the game board
     private Board board;
     
     //different animations for the player
-    protected static final String ANIMATION_KEY_ROTATE_COLUMNS_BACK = "Rotate1";
-    protected static final String ANIMATION_KEY_ROTATE_COLUMNS_FRONT = "Rotate2";
+    protected static final String ANIMATION_KEY_ROTATE_BACK = "Rotate1";
+    protected static final String ANIMATION_KEY_ROTATE_FRONT = "Rotate2";
     protected static final String ANIMATION_KEY_VICTORY = "Victory";
     protected static final String ANIMATION_KEY_LOSE = "Lose";
     
@@ -47,15 +48,11 @@ public abstract class Player extends Entity implements IElement
     private static final int START_COLUMN = 1;
     
     //the starting coordinates
-    private final int startX;
-    private final int startY;
+    private int startX;
+    private int startY;
     
-    public Player(final Image image, final int startX, final int startY)
+    public Player(final Image image, final boolean multiplayer)
     {
-        //set the start coordinates
-        this.startX = startX;
-        this.startY = startY;
-        
         //set y-coordinate
         super.setY(this.startY);
         
@@ -65,8 +62,49 @@ public abstract class Player extends Entity implements IElement
         //store the spritesheet image
         super.setImage(image);
         
-        //set the starting column
+        //set animations
+        setupAnimations();
+        
+        //setup the coordinates
+        setCoordinates(multiplayer);
+    }
+    
+    /**
+     * Start to switch the columns.
+     * @return true if we were successful, false otherwise
+     */
+    protected boolean switchColumns()
+    {
+        //if we can swap columns, initialize it then
+        if (BoardHelper.canSwapColumns(getBoard().getPieces()) && hasAnimationFinished())
+        {
+            //initialize the column swap
+            BoardHelper.startSwap(getBoard(), (int)getCol(), (int)getCol() + 1);
+            
+            //we were successful
+            return true;
+        }
+        else
+        {
+            //we can't switch columns at the moment
+            return false;
+        }
+    }
+    
+    /**
+     * Set the start coordinates for the player as if they are in the first column.<br>
+     * Also we will set the starting coordinates for the player
+     * @param startX x-coordinate
+     * @param startY y-coordinate
+     */
+    protected void setStartCoordinates(final int startX, final int startY)
+    {
+        this.startX = startX;
+        this.startY = startY;
+        
+        //set the starting position
         setCol(START_COLUMN);
+        setY(getStartY());
     }
     
     /**
@@ -84,6 +122,15 @@ public abstract class Player extends Entity implements IElement
     private int getStartX()
     {
         return this.startX;
+    }
+    
+    /**
+     * Get the starting x-coordinate
+     * @return The starting x-coordinate
+     */
+    private int getStartY()
+    {
+        return this.startY;
     }
     
     /**
@@ -125,11 +172,6 @@ public abstract class Player extends Entity implements IElement
     {
         return this.front;
     }
-    
-    /**
-     * Each player needs to setup their animations
-     */
-    protected abstract void setupAnimations();
     
     /**
      * Get the player's game board
