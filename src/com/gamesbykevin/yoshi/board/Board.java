@@ -5,6 +5,7 @@ import com.gamesbykevin.framework.util.*;
 
 import com.gamesbykevin.yoshi.board.piece.Piece;
 import com.gamesbykevin.yoshi.engine.Engine;
+import com.gamesbykevin.yoshi.entity.Entity;
 import com.gamesbykevin.yoshi.shared.IElement;
 
 import java.awt.Graphics;
@@ -15,7 +16,7 @@ import java.util.List;
  * The board the player will play on
  * @author GOD
  */
-public class Board extends Sprite implements IElement
+public final class Board extends Sprite implements IElement
 {
     /**
      * The dimensions of our board
@@ -30,10 +31,15 @@ public class Board extends Sprite implements IElement
     private Timer timer;
     
     //the amount of time to wait to apply gravity
-    private static final long DELAY_GRAVITY = Timers.toNanoSeconds(50L);
+    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(250L);
     
-    //not time delay
-    private static final long DELAY_NONE = 0;
+    /**
+     * The amount of time at which we apply gravity when we have a yoshi
+     */
+    protected static final long DELAY_GRAVITY_YOSHI = Timers.toNanoSeconds(200L);
+    
+    //do we have a losing board
+    private boolean lose = false;
     
     public Board()
     {
@@ -90,6 +96,15 @@ public class Board extends Sprite implements IElement
     }
     
     /**
+     * Get the timer.
+     * @return The timer we use to determine when to apply gravity.
+     */
+    protected Timer getTimer()
+    {
+        return this.timer;
+    }
+    
+    /**
      * Remove the piece from the board
      * @param piece The piece we want to remove
      */
@@ -110,20 +125,34 @@ public class Board extends Sprite implements IElement
      */
     protected boolean hasPiece(final Piece piece)
     {
+        return (getPiece(piece) != null);
+    }
+    
+    /**
+     * Get the piece at the specified piece location.<br>
+     * We will not ignore the specified piece to check if another piece also exists at the same location
+     * @param piece The piece whose location we want to check
+     * @return The piece at this location, if none are found null is returned
+     */
+    protected Piece getPiece(final Piece piece)
+    {
         //check all pieces to see if they are at the location
         for (int i = 0; i < getPieces().size(); i++)
         {
+            //get the current piece
+            final Piece tmp = getPieces().get(i);
+            
             //we don't want to check our own piece
-            if (getPieces().get(i).getId() != piece.getId())
+            if (tmp.getId() != piece.getId())
             {
                 //if the current piece has this location, return true
-                if (getPieces().get(i).equals(piece))
-                    return true;
+                if (tmp.equals(piece))
+                    return tmp;
             }
         }
         
-        //we could not find a piece here
-        return false;
+        //none were found, return null
+        return null;
     }
     
     /**
@@ -150,47 +179,96 @@ public class Board extends Sprite implements IElement
      */
     public void applyGravity()
     {
-        timer.setRemaining(DELAY_NONE);
+        getTimer().setRemaining(Entity.DELAY_NONE);
+    }
+    
+    /**
+     * Did we lose
+     * @return true if the board has filled up and the game is over, false otherwise
+     */
+    public boolean hasLost()
+    {
+        return this.lose;
     }
     
     @Override
     public void update(final Engine engine) throws Exception
     {
+        //no need to continue if we lost
+        if (hasLost())
+            return;
+        
+        //if we don't have any starting pieces, we need to spawn them
         if (!BoardHelper.hasStartingPieces(getPieces()))
         {
             //if no pieces at the top, spawn some
             BoardHelper.spawnPieces(engine);
+            
+            //no need to continue
+            return;
         }
-        else if (!BoardHelper.hasFallingPieces(getPieces()))
+        
+        //if no pieces are falling, drop the starting pieces at the top
+        if (!BoardHelper.hasFallingPieces(getPieces()))
         {
             //drop the starting pieces
             BoardHelper.dropStartingPieces(getPieces());
+            
+            //no need to continue
+            return;
         }
-        else if (BoardHelper.hasDestroyedPiece(getPieces()))
+        
+        //if there are pieces that are destroyed we need to handle those
+        if (BoardHelper.hasDestroyedPiece(getPieces()))
         {
             //if we have a destroyed piece pause everything else
             BoardHelper.manageDestroyedPieces(this, engine.getMain().getTime());
+            
+            //no need to continue
+            return;
         }
-        else if (BoardHelper.hasYoshi(this))
+        
+        //update gravity timer
+        getTimer().update(engine.getMain().getTime());
+
+        //do we apply gravity
+        boolean applyGravity = (getTimer().hasTimePassed());
+
+        //reset the timer
+        if (applyGravity)
+            getTimer().reset();
+        
+        //if we have a yoshi we will manage the pieces differently
+        if (BoardHelper.hasYoshi(getPieces()))
         {
-            //if we have yoshi, handle the rest here
-            
-            
+            for (int i = 0; i < getPieces().size(); i++)
+            {
+                //get the current piece
+                final Piece piece = getPieces().get(i);
+                
+                //skip the piece if it is not a yoshi
+                if (!piece.isYoshi())
+                    continue;
+
+                //we are only worried about updating the top/bottom shells
+                if (piece.getType() != Piece.TYPE_SHELL_BOTTOM && piece.getType() != Piece.TYPE_SHELL_TOP)
+                    continue;
+                
+                //manage the creation
+                BoardHelper.manageYoshiCreation(piece, this, engine.getMain().getTime(), applyGravity);
+            }
         }
         else
         {
-            //update gravity timer
-            this.timer.update(engine.getMain().getTime());
-
-            //do we apply gravity
-            boolean applyGravity = (this.timer.hasTimePassed());
-
-            //reset the timer
-            if (applyGravity)
-                timer.reset();
-
+            /**
+             * If we don't have a yoshi continue business as usual
+             */
             for (int i = 0; i < getPieces().size(); i++)
             {
+                //if we have a yoshi, don't continue here
+                if (BoardHelper.hasYoshi(getPieces()))
+                    break;
+                
                 //get the current piece
                 final Piece piece = getPieces().get(i);
 
@@ -198,6 +276,9 @@ public class Board extends Sprite implements IElement
                 BoardHelper.updatePiece(piece, this, engine.getMain().getTime(), applyGravity);
             }
         }
+        
+        //check if we have a losing board
+        lose = BoardHelper.hasLosingBoard(getPieces());
     }
     
     @Override

@@ -46,7 +46,11 @@ public final class Manager implements IManager
         
         if (this.player == null)
         {
-            this.player = new Human(engine.getResources().getGameImage(GameImages.Keys.Spritesheet));
+            this.player = new Human(
+                engine.getResources().getGameImage(GameImages.Keys.Spritesheet),
+                Player.SINGLE_PLAYER_START_X,
+                Player.SINGLE_PLAYER_START_Y
+                );
         }
     }
     

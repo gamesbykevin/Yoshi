@@ -1,11 +1,10 @@
 package com.gamesbykevin.yoshi.board.piece;
 
 import com.gamesbykevin.framework.base.Animation;
-import com.gamesbykevin.framework.base.Sprite;
 import com.gamesbykevin.framework.util.Timers;
 
-import com.gamesbykevin.yoshi.board.Board;
 import com.gamesbykevin.yoshi.board.BoardHelper;
+import com.gamesbykevin.yoshi.entity.Entity;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -14,7 +13,7 @@ import java.awt.Image;
  * Each cell on the board is a piece
  * @author GOD
  */
-public final class Piece extends Sprite
+public final class Piece extends Entity
 {
     /**
      * The different types of pieces
@@ -35,70 +34,99 @@ public final class Piece extends Sprite
     public static final String ANIMATION_KEY_PLACED = "Placed";
     public static final String ANIMATION_KEY_DESTROYED = "Destroyed";
     
+    //the different animations for the different yoshi sizes
+    public static final String ANIMATION_KEY_CREATE_YOSHI_TINY = "YoshiTiny";
+    public static final String ANIMATION_KEY_CREATE_YOSHI_SMALL = "YoshiSmall";
+    public static final String ANIMATION_KEY_CREATE_YOSHI_MEDIUM = "YoshiMedium";
+    public static final String ANIMATION_KEY_CREATE_YOSHI_LARGE = "YoshiLarge";
+    
+    //the different yoshi sizes for each animation
+    public static final int YOSHI_SIZE_TINY = 2;
+    public static final int YOSHI_SIZE_SMALL = 6;
+    public static final int YOSHI_SIZE_MEDIUM = 8;
+    public static final int YOSHI_SIZE_LARGE = 9;
+    
     //default animation delay
     private static final long DELAY_DEFAULT = Timers.toNanoSeconds(600L);
     
     //how long the destroy animation lasts
     private static final long DELAY_DESTROY = Timers.toNanoSeconds(300L);
     
-    //no delay
-    private static final long DELAY_NONE = 0;
+    //how long the yoshi create animation lasts
+    private static final long DELAY_YOSHI_CREATE = Timers.toNanoSeconds(166L);
     
     //the type of piece (goomba, plant, shell top, etc...)
     private final int type;
     
-    //should this piece be falling?
+    //has the piece been placed
+    private boolean placed = false;
+    
+    //is the piece frozen?
     private boolean frozen = false;
     
     //is the piece destroyed
     private boolean destroyed = false;
     
+    //if this piece part of a yoshi
+    private boolean yoshi = false;
+    
+    //the yoshi size
+    private int size = 0;
+    
     public Piece(final int type)
     {
+        super();
+        
         this.type = type;
         
-        //create the sprite sheet
-        super.createSpriteSheet();
+        //do not place the new piece
+        setPlaced(false);
         
-        //do not freeze the new piece
-        setFrozen(false);
+        //freeze the piece at first
+        setFrozen(true);
         
         switch(type)
         {
             case TYPE_GOOMBA:
-                addAnimation(ANIMATION_KEY_FALLING, 0, 730, 32, 32, 2, DELAY_DEFAULT, true);
-                addAnimation(ANIMATION_KEY_PLACED, 0, 768, 44, 32, 1, DELAY_NONE, false);
+                addAnimation(ANIMATION_KEY_FALLING,   0,   730, 32, 32, 2, DELAY_DEFAULT, true);
+                addAnimation(ANIMATION_KEY_PLACED,    0,   768, 44, 32, 1, DELAY_NONE, false);
                 addAnimation(ANIMATION_KEY_DESTROYED, 176, 768, 44, 32, 1, DELAY_DESTROY, false);
                 break;
                 
             case TYPE_SQUID:
-                addAnimation(ANIMATION_KEY_FALLING, 64, 730, 32, 30, 2, DELAY_DEFAULT, true);
-                addAnimation(ANIMATION_KEY_PLACED, 44, 768, 44, 32, 1, DELAY_NONE, false);
+                addAnimation(ANIMATION_KEY_FALLING,   64,  730, 32, 30, 2, DELAY_DEFAULT, true);
+                addAnimation(ANIMATION_KEY_PLACED,    44,  768, 44, 32, 1, DELAY_NONE, false);
                 addAnimation(ANIMATION_KEY_DESTROYED, 176, 768, 44, 32, 1, DELAY_DESTROY, false);
                 break;
                 
             case TYPE_BOO:
-                addAnimation(ANIMATION_KEY_FALLING, 128, 730, 32, 30, 2, DELAY_DEFAULT, true);
-                addAnimation(ANIMATION_KEY_PLACED, 88, 768, 44, 32, 1, DELAY_NONE, false);
+                addAnimation(ANIMATION_KEY_FALLING,   128, 730, 32, 30, 2, DELAY_DEFAULT, true);
+                addAnimation(ANIMATION_KEY_PLACED,    88,  768, 44, 32, 1, DELAY_NONE, false);
                 addAnimation(ANIMATION_KEY_DESTROYED, 176, 768, 44, 32, 1, DELAY_DESTROY, false);
                 break;
                 
             case TYPE_PLANT:
-                addAnimation(ANIMATION_KEY_FALLING, 192, 730, 32, 32, 2, DELAY_DEFAULT, true);
-                addAnimation(ANIMATION_KEY_PLACED, 132, 768, 44, 32, 1, DELAY_NONE, false);
+                addAnimation(ANIMATION_KEY_FALLING,   192, 730, 32, 32, 2, DELAY_DEFAULT, true);
+                addAnimation(ANIMATION_KEY_PLACED,    132, 768, 44, 32, 1, DELAY_NONE, false);
                 addAnimation(ANIMATION_KEY_DESTROYED, 176, 768, 44, 32, 1, DELAY_DESTROY, false);
                 break;
                 
             case TYPE_SHELL_TOP:
-                addAnimation(ANIMATION_KEY_FALLING, 256, 730, 32, 32, 1, DELAY_NONE, false);
-                addAnimation(ANIMATION_KEY_PLACED,  256, 730, 32, 32, 1, DELAY_NONE, false);
+                addAnimation(ANIMATION_KEY_FALLING,   256, 730, 32, 32, 1, DELAY_NONE, false);
+                addAnimation(ANIMATION_KEY_PLACED,    256, 730, 32, 32, 1, DELAY_NONE, false);
                 addAnimation(ANIMATION_KEY_DESTROYED, 176, 768, 44, 32, 1, DELAY_DESTROY, false);
                 break;
                 
             case TYPE_SHELL_BOTTOM:                
-                addAnimation(ANIMATION_KEY_FALLING, 288, 730, 32, 32, 1, DELAY_NONE, false);
-                addAnimation(ANIMATION_KEY_PLACED,  288, 730, 32, 32, 1, DELAY_NONE, false);
+                addAnimation(ANIMATION_KEY_FALLING,   288, 730, 32, 32, 1, DELAY_NONE, false);
+                addAnimation(ANIMATION_KEY_PLACED,    288, 730, 32, 32, 1, DELAY_NONE, false);
                 addAnimation(ANIMATION_KEY_DESTROYED, 176, 768, 44, 32, 1, DELAY_DESTROY, false);
+                
+                //the animations for each differnt yoshi 
+                addAnimation(ANIMATION_KEY_CREATE_YOSHI_TINY,   0, 470, 44, 42, 6, DELAY_YOSHI_CREATE, false);
+                addAnimation(ANIMATION_KEY_CREATE_YOSHI_SMALL,  0, 512, 44, 55, 6, DELAY_YOSHI_CREATE, false);
+                addAnimation(ANIMATION_KEY_CREATE_YOSHI_MEDIUM, 0, 567, 55, 61, 6, DELAY_YOSHI_CREATE, false);
+                addAnimation(ANIMATION_KEY_CREATE_YOSHI_LARGE,  0, 628, 63, 81, 6, DELAY_YOSHI_CREATE, false);
                 break;
                 
         }
@@ -108,13 +136,47 @@ public final class Piece extends Sprite
     }
     
     /**
+     * Mark this piece as part of a yoshi
+     */
+    /**
+     * Mark this piece as part of a yoshi.
+     * @param size The size of the yoshi, the number of pieces used to create the yoshi
+     */
+    public void markYoshi(final int size)
+    {
+        //mark as part of yoshi
+        this.yoshi = true;
+        
+        //store the size so we will know which animation to use
+        this.size = size;
+    }
+    
+    /**
+     * Get the yoshi size.
+     * @return The total number of pieces used to create the yoshi
+     */
+    public int getYoshiSize()
+    {
+        return this.size;
+    }
+    
+    /**
+     * Is this piece part of a yoshi?
+     * @return true if the piece is part of a yoshi, false otherwise
+     */
+    public boolean isYoshi()
+    {
+        return this.yoshi;
+    }
+    
+    /**
      * Place the piece at the current location.<br>
      * We will freeze the piece as well as change the animation
      */
     public void placePiece()
     {
         //stop dropping piece
-        setFrozen(true);
+        setPlaced(true);
 
         //also change the animation
         setAnimation(Piece.ANIMATION_KEY_PLACED);
@@ -130,46 +192,6 @@ public final class Piece extends Sprite
         
         //update y-coordinate
         setY(getY() + BoardHelper.DROP_PIXEL_DISTANCE);
-    }
-    
-    /**
-     * Assign the current animation.<br>
-     * Also make sure we set the appropriate dimension
-     * @param key The key of the animation
-     */
-    public void setAnimation(final Object key)
-    {
-        super.getSpriteSheet().setCurrent(key);
-        
-        //make sure we adjust the dimensions to a default
-        adjustDimensions();
-    }
-    
-    /**
-     * Has the current animation finished
-     * @return true=yes, false=no
-     */
-    public boolean hasAnimationFinished()
-    {
-        return super.getSpriteSheet().hasFinished();
-    }
-    
-    /**
-     * Update the animation.
-     * @param time Time per update (nano-seconds)
-     */
-    public void updateAnimation(final long time) throws Exception
-    {
-        super.getSpriteSheet().update(time);
-    }
-    
-    /**
-     * Set the width/height based on the current animation frame
-     */
-    public void adjustDimensions()
-    {
-        //set the width/height
-        super.setDimensions(super.getSpriteSheet().getLocation());
     }
     
     /**
@@ -198,8 +220,8 @@ public final class Piece extends Sprite
     }
     
     /**
-     * Freeze the piece
-     * @param frozen Assign true if we don't want the piece to fall, false otherwise
+     * Flag the piece as frozen
+     * @param frozen true If the piece is not placed but we want to not move the piece, false otherwise
      */
     public void setFrozen(final boolean frozen)
     {
@@ -207,12 +229,34 @@ public final class Piece extends Sprite
     }
     
     /**
-     * If this piece frozen?
-     * @return true if the piece is to not fall, false otherwise
+     * If the piece frozen?
+     * @return true If the piece is not placed but we want to not move the piece, false otherwise
      */
     public boolean isFrozen()
     {
         return this.frozen;
+    }
+    
+    /**
+     * Flag the piece as placed
+     * @param placed true if the piece is being placed on the board permanent, false otherwise
+     */
+    public void setPlaced(final boolean placed)
+    {
+        this.placed = placed;
+        
+        //if placed, we also can't be frozen
+        if (isPlaced())
+            setFrozen(!isPlaced());
+    }
+    
+    /**
+     * If the piece place?
+     * @return true If the piece was placed permanently, false otherwise
+     */
+    public boolean isPlaced()
+    {
+        return this.placed;
     }
     
     /**
@@ -222,31 +266,6 @@ public final class Piece extends Sprite
     public int getType()
     {
         return this.type;
-    }
-    
-    /**
-     * Add animation to sprite sheet
-     * @param key Object used to identify the animation
-     * @param x starting x-coordinate of animation
-     * @param y starting y-coordinate of animation
-     * @param w width of animation
-     * @param h height of animation
-     * @param count number of animations
-     * @param delay time delay for each animation (nano-seconds)
-     * @param loop do we loop animation
-     */
-    private void addAnimation(final Object key, final int x, final int y, final int w, final int h, final int count, final long delay, final boolean loop)
-    {
-        Animation animation = new Animation();
-        animation.setLoop(loop);
-        
-        for (int i=0; i < count; i++)
-        {
-            animation.add(x + (i * w), y, w, h, delay);
-        }
-        
-        //add to spritesheet
-        super.getSpriteSheet().add(animation, key);
     }
     
     /**
