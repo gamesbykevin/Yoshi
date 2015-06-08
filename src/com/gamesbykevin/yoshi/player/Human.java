@@ -70,22 +70,6 @@ public final class Human extends Player
         if (getBoard().hasLost())
             return;
         
-        //update the board
-        super.getBoard().update(engine);
-        
-        if (getBoard().hasLost())
-        {
-            //set the lose animation
-            super.setAnimation(Player.ANIMATION_KEY_LOSE);
-            
-            //set the coordinates in middle of the board
-            super.setX(getBoard().getX() - (getWidth() / 2));
-            super.setY(getBoard().getY() - (getHeight() / 2));
-            
-            //no need to continue
-            return;
-        }
-        
         //update animation
         super.updateAnimation(engine.getMain().getTime());
         
@@ -146,6 +130,9 @@ public final class Human extends Player
                 }
             }
         }
+        
+        //update the board
+        super.updateBoard(engine);
     }
     
     @Override

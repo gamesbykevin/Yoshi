@@ -116,6 +116,27 @@ public abstract class Player extends Entity implements IElement, IPlayer
     public abstract void update(final Engine engine) throws Exception;
     
     /**
+     * Update the board and check if we lost
+     * @param engine Object containing all game elements
+     * @throws Exception 
+     */
+    protected void updateBoard(final Engine engine) throws Exception
+    {
+        //update the board
+        getBoard().update(engine);
+        
+        if (getBoard().hasLost())
+        {
+            //set the lose animation
+            super.setAnimation(Player.ANIMATION_KEY_LOSE);
+            
+            //set the coordinates in middle of the board
+            super.setX(getBoard().getX() - (getWidth() / 2));
+            super.setY(getBoard().getY() - (getHeight() / 2));
+        }
+    }
+    
+    /**
      * Get the starting x-coordinate
      * @return The starting x-coordinate
      */

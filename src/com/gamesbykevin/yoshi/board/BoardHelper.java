@@ -255,24 +255,49 @@ public final class BoardHelper
             //if the piece is falling, check if we should swap it
             if (!piece.isFrozen() && !piece.isPlaced())
             {
+                //temp piece
+                Piece tmp;
+                
                 //depending on the side we need to check if the falling piece should be swapped
                 if (piece.getCol() == rightCol)
                 {
                     //get the neighbor piece
-                    final Piece tmp = board.getPiece(leftCol, (int)piece.getRow(), piece.getId());
+                    tmp = board.getPiece(leftCol, (int)piece.getRow(), piece.getId());
                     
                     //if a piece exists next to this piece and is placed, we need to swap
                     if (tmp != null && tmp.isPlaced())
+                    {
                         piece.setTargetCol(leftCol);
+                    }
+                    else
+                    {
+                        //also check just below so pieces don't get stuck
+                        tmp = board.getPiece(leftCol, piece.getRow() + BoardHelper.ROW_DROP, piece.getId());
+
+                        //if a piece exists next to this piece and is placed, we need to swap
+                        if (tmp != null && tmp.isPlaced())
+                            piece.setTargetCol(leftCol);
+                    }
                 }
                 else if (piece.getCol() == leftCol)
                 {
                     //get the neighbor piece
-                    final Piece tmp = board.getPiece(rightCol, (int)piece.getRow(), piece.getId());
+                    tmp = board.getPiece(rightCol, (int)piece.getRow(), piece.getId());
                     
                     //if a piece exists next to this piece and is placed, we need to swap
                     if (tmp != null && tmp.isPlaced())
+                    {
                         piece.setTargetCol(rightCol);
+                    }
+                    else
+                    {
+                        //also check just below so pieces don't get stuck
+                        tmp = board.getPiece(rightCol, piece.getRow() + BoardHelper.ROW_DROP, piece.getId());
+
+                        //if a piece exists next to this piece and is placed, we need to swap
+                        if (tmp != null && tmp.isPlaced())
+                            piece.setTargetCol(rightCol);
+                    }
                 }
             }
             else

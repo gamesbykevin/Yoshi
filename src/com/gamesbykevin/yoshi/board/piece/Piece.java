@@ -87,7 +87,7 @@ public final class Piece extends Entity
     private int size = 0;
     
     //the target column, used when switching columns
-    private int targetCol = 0;
+    private double targetCol = 0;
     
     public Piece(final int type)
     {
@@ -173,7 +173,7 @@ public final class Piece extends Entity
      * Get the target column
      * @return The column we want the piece to be at
      */
-    public int getTargetCol()
+    public double getTargetCol()
     {
         return this.targetCol;
     }
