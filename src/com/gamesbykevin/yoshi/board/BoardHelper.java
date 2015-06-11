@@ -55,10 +55,10 @@ public final class BoardHelper
     /**
      * The x-coordinates for each column for player 2 in multi-player
      */
-    public static final int MULTI_PLAYER_2_COLUMN_1_X = 380;
+    public static final int MULTI_PLAYER_2_COLUMN_1_X = MULTI_PLAYER_1_COLUMN_1_X + 300;
     
     //the starting y-coordinate
-    public static final int MULTI_PLAYER_2_ROW_1_Y = 75;
+    public static final int MULTI_PLAYER_2_ROW_1_Y = MULTI_PLAYER_1_ROW_1_Y;
     
     //the center of the board for player 2
     public static final Point MULTI_PLAYER_2_BOARD_CENTER = new Point(470,260);

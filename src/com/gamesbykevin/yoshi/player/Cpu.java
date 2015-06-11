@@ -26,7 +26,7 @@ public final class Cpu extends Player
     /**
      * The amount of time to wait between each move
      */
-    private static final long MOVE_DELAY = Timers.toNanoSeconds(15L);
+    private static final long MOVE_DELAY = Timers.toNanoSeconds(250L);
     
     /*
      * The expected number of falling pieces, while locating our target(S)
@@ -116,26 +116,33 @@ public final class Cpu extends Player
             //if our targeted pieces are still falling
             if (hasFallingPiecesBefore && hasFallingPieceAfter)
             {
+                //update movement timer
+                timer.update(engine.getMain().getTime());
+
+                //don't continue until timer is finished
+                if (!timer.hasTimePassed())
+                    return;
+                
                 //if our targets are not yet at their destinations
                 if (!hasTargetsSet())
                 {
-                    //update movement timer
-                    timer.update(engine.getMain().getTime());
-                    
-                    //don't continue until timer is finished
-                    if (!timer.hasTimePassed())
-                        return;
                     
                     //make sure we aren't currently swapping the board
                     if (!BoardHelper.isSwappingColumns(getBoard().getPieces()))
                     {
-                        //reset timer
-                        timer.reset();
 
                         //move targets to their assigned destinations
                         placeTargets();
                     }
                 }
+                else
+                {
+                    //if the pieces are in place, apply gravity
+                    getBoard().applyGravity();
+                }
+
+                //reset timer
+                timer.reset();
             }
             else
             {

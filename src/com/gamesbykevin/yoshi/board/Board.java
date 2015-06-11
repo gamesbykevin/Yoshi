@@ -40,7 +40,7 @@ public final class Board extends Sprite implements IElement
     private Timer timer;
     
     //the amount of time to wait to apply gravity
-    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(25L);
+    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(500L);
     
     /**
      * The amount of time at which we apply gravity when we have a yoshi

@@ -42,10 +42,10 @@ public abstract class Player extends Entity implements IElement, IPlayer
     protected static final int PLAYER_MOVE_PIXELS = 60;
     
     //the starting locations for multiplayer
-    public static final int MULTI_PLAYER_1_START_X = 60;
-    public static final int MULTI_PLAYER_1_START_Y = 425;
-    public static final int MULTI_PLAYER_2_START_X = 360;
-    public static final int MULTI_PLAYER_2_START_Y = 425;
+    public static final int MULTI_PLAYER_1_START_X = 50;
+    public static final int MULTI_PLAYER_1_START_Y = 423;
+    public static final int MULTI_PLAYER_2_START_X = MULTI_PLAYER_1_START_X + 300;
+    public static final int MULTI_PLAYER_2_START_Y = MULTI_PLAYER_1_START_Y;
     
     //the players starting column
     private static final int START_COLUMN = 1;

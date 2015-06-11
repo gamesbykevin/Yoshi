@@ -25,8 +25,8 @@ public final class Manager implements IManager
     //background image to display
     private Image image;
     
-    //the player playing the game
-    private Player player;
+    //the players playing the game
+    private List<Player> players;
     
     /**
      * Constructor for Manager, this is the point where we load any menu option configurations
@@ -37,25 +37,37 @@ public final class Manager implements IManager
     {
         //set the audio depending on menu setting
         engine.getResources().setAudioEnabled(engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Sound) == CustomMenu.SOUND_ENABLED);
+        
+        //create the list container of players
+        this.players = new ArrayList<>();
     }
     
     @Override
     public void reset(final Engine engine) throws Exception
     {
-        this.image = engine.getResources().getGameImage(GameImages.Keys.Background1Player);
+        //are we playing multi-player
+        final boolean multiplayer = true;
         
-        final boolean multiplayer = false;
+        //remove any existing players
+        players.clear();
         
-        if (this.player == null)
+        if (!multiplayer)
         {
-            //create a new player
-            this.player = new Cpu(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer);
+            //the background image
+            this.image = engine.getResources().getGameImage(GameImages.Keys.Background1Player);
+            
+            //create a new player and add to list
+            players.add(new Cpu(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer));
         }
-    }
-    
-    public Player getPlayer()
-    {
-        return this.player;
+        else
+        {
+            //the background image
+            this.image = engine.getResources().getGameImage(GameImages.Keys.Background2Player);
+            
+            //create players and add to list
+            players.add(new Human(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer));
+            players.add(new Cpu(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer));
+        }
     }
     
     /**
@@ -66,6 +78,18 @@ public final class Manager implements IManager
     {
         try
         {
+            if (image != null)
+            {
+                image.flush();
+                image = null;
+            }
+            
+            for (int i = 0; i < players.size(); i++)
+            {
+                players.get(i).dispose();
+                players.set(i, null);
+            }
+            
             //recycle objects
             super.finalize();
         }
@@ -83,9 +107,12 @@ public final class Manager implements IManager
     @Override
     public void update(final Engine engine) throws Exception
     {
-        if (player != null)
+        if (players != null)
         {
-            player.update(engine);
+            for (int i = 0; i < players.size(); i++)
+            {
+                players.get(i).update(engine);
+            }
         }
     }
     
@@ -98,9 +125,12 @@ public final class Manager implements IManager
     {
         graphics.drawImage(image, 0, 0, null);
         
-        if (player != null)
+        if (players != null)
         {
-            player.render(graphics);
+            for (int i = 0; i < players.size(); i++)
+            {
+                players.get(i).render(graphics);
+            }
         }
     }
 }
