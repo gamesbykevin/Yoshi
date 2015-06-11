@@ -26,12 +26,17 @@ public final class Cpu extends Player
     /**
      * The amount of time to wait between each move
      */
-    private static final long MOVE_DELAY = Timers.toNanoSeconds(25L);
+    private static final long MOVE_DELAY = Timers.toNanoSeconds(15L);
     
     /*
      * The expected number of falling pieces, while locating our target(S)
      */
     private static final int FALLING_PIECE_COUNT = 2;
+    
+    /**
+     * 0 Count
+     */
+    private static final int COUNT_NONE = 0;
     
     public Cpu(final Image image, final boolean multiplayer)
     {
@@ -255,8 +260,8 @@ public final class Cpu extends Player
     }
     
     /**
-     * Locate the targets
-     * @throws Exception If the number of falling pieces is not 2
+     * Here we will take the falling pieces and score each column to determine the best move
+     * @throws Exception If the number of falling pieces is not 2, of if no targets are found
      */
     private void locateTargets() throws Exception
     {
@@ -274,7 +279,7 @@ public final class Cpu extends Player
         {
             //throw exception if we don't get the expected count (should not happen)
             if (pieces.size() != FALLING_PIECE_COUNT)
-                throw new Exception("Number of falling pieces is not 2 (" + pieces.size() + ")");
+                throw new Exception("Expected # of falling pieces is not 2 (" + pieces.size() + ")");
             
             //now check each column for the current piece
             for (int i = 0; i < pieces.size(); i++)
@@ -286,24 +291,27 @@ public final class Cpu extends Player
                 for (int col = 0; col < Board.COLUMNS; col++)
                 {
                     //the score of this column
-                    int score;
+                    int score = 0;
                     
                     //if the top piece is a top shell, let's see if we can create a yoshi
                     if (piece.getType() == Piece.TYPE_SHELL_TOP)
                     {
-                        //get the total # of pieces that are above the bottom shell
+                        //get the total # of pieces that are above the bottom shell so we can check the size of the yoshi
                         final int count = CpuHelper.getBottomShellCount(getBoard(), col);
 
+                        //get the row height so we can reward more for yoshi's created at a higher height, which will keep the height of the board lower
+                        final int height = CpuHelper.getRowHeight(getBoard(), col);
+                        
                         //calculate score
-                        score = Board.SCORE_YOSHI_PIECE * count;
+                        score = (Board.SCORE_YOSHI_PIECE * count) + (Board.SCORE_YOSHI_HEIGHT_REWARD * height);
                     }
                     else if (piece.getType() == Piece.TYPE_SHELL_BOTTOM)
                     {
-                        //get the row height
+                        //get the row height, we will penalize more, because we want to place this at the lowest point
                         final int height = CpuHelper.getRowHeight(getBoard(), col);
 
                         //calculate score
-                        score = Board.SCORE_PIECE_HEIGHT * height;
+                        score = Board.SCORE_BOTTOM_SHELL_HEIGHT * height;
                     }
                     else
                     {
@@ -316,22 +324,34 @@ public final class Cpu extends Player
                             //if the pieces match score it
                             if (top.getType() == piece.getType())
                             {
-                                //calculate score
+                                //calculate score as we want to match pieces
                                 score = Board.SCORE_PIECE_MATCH;
                             }
                             else
                             {
-                                //if no match score by the height
+                                //the number of pieces above a bottom shell
+                                final int count = CpuHelper.getBottomShellCount(getBoard(), col);
+                                
+                                //get the height of the column
                                 final int height = CpuHelper.getRowHeight(getBoard(), col);
-
-                                //calculate score
-                                score = Board.SCORE_PIECE_HEIGHT * height;
+                                
+                                //if there is no bottom shell in this column
+                                if (count == COUNT_NONE)
+                                {
+                                    //calculate score, if no match and no bottom shell, penalize by the height
+                                    score = Board.SCORE_PIECE_HEIGHT * height;
+                                }
+                                else
+                                {
+                                    //penalize the height, but add a different penalty for the pieces that can create a yoshi
+                                    score = (Board.SCORE_PIECE_HEIGHT * (height - count)) + (Board.SCORE_YOSHI_HEIGHT_PENALTY * count);
+                                }
                             }
                         }
                         else
                         {
-                            //calculate score
-                            score = Board.SCORE_PIECE_HEIGHT * 0;
+                            //there is no top piece so no height etc... the score will be 0
+                            score = Board.SCORE_NONE;
                         }
                     }
 
@@ -364,14 +384,17 @@ public final class Cpu extends Player
                 }
             }
             
+            //this should not happen
+            if (targets.isEmpty())
+                throw new Exception("No targets are found");
+            
             //the first target will be the highest scoring
             target1 = targets.get(0);
             
             /**
              * Now the targets are sorted in descending order.<br>
-             * We can start checking one by one to set the targets
+             * We can start checking for the next one that isn't already targeted
              */
-            
             for (int i = 1; i < targets.size(); i++)
             {
                 //get the current target

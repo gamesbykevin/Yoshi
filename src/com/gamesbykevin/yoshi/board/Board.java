@@ -27,8 +27,11 @@ public final class Board extends Sprite implements IElement
     //the scoring values
     public static final int SCORE_NONE = 0;
     public static final int SCORE_YOSHI_PIECE = 50;
+    public static final int SCORE_YOSHI_HEIGHT_REWARD = 25;
     public static final int SCORE_PIECE_MATCH = 10;
+    public static final int SCORE_YOSHI_HEIGHT_PENALTY = -1;
     public static final int SCORE_PIECE_HEIGHT = -5;
+    public static final int SCORE_BOTTOM_SHELL_HEIGHT = -7;
     
     //the pieces in the game
     private List<Piece> pieces;
@@ -37,7 +40,7 @@ public final class Board extends Sprite implements IElement
     private Timer timer;
     
     //the amount of time to wait to apply gravity
-    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(60L);
+    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(25L);
     
     /**
      * The amount of time at which we apply gravity when we have a yoshi
