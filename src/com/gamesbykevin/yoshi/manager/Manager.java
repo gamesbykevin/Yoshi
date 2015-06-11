@@ -49,7 +49,7 @@ public final class Manager implements IManager
         if (this.player == null)
         {
             //create a new player
-            this.player = new Human(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer);
+            this.player = new Cpu(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer);
         }
     }
     

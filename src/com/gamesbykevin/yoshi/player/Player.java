@@ -6,9 +6,12 @@ import com.gamesbykevin.yoshi.board.BoardHelper;
 import com.gamesbykevin.yoshi.engine.Engine;
 import com.gamesbykevin.yoshi.entity.Entity;
 import com.gamesbykevin.yoshi.shared.IElement;
+import java.awt.Color;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The player that plays the board
@@ -51,6 +54,9 @@ public abstract class Player extends Entity implements IElement, IPlayer
     private int startX;
     private int startY;
     
+    //list of columns and the order they currently reside (needed so api will know which columns to switch)
+    private List<Integer> columnOrder;
+    
     public Player(final Image image, final boolean multiplayer)
     {
         //set y-coordinate
@@ -67,19 +73,56 @@ public abstract class Player extends Entity implements IElement, IPlayer
         
         //setup the coordinates
         setCoordinates(multiplayer);
+        
+        //create the list
+        this.columnOrder = new ArrayList<>();
+        
+        //add the columns in their appropriate starting order
+        for (int i = 0; i < Board.COLUMNS; i++)
+        {
+            this.columnOrder.add(i);
+        }
     }
     
     /**
-     * Start to switch the columns.
+     * Start to switch the columns.<br>
+     * We will also set the appropriate animation as well.
      * @return true if we were successful, false otherwise
+     * @throws Exception If the column(s) are not found in the columnOrder list
      */
-    protected boolean switchColumns()
+    protected boolean switchColumns() throws Exception
     {
         //if we can swap columns, initialize it then
         if (BoardHelper.canSwapColumns(getBoard().getPieces()) && hasAnimationFinished())
         {
+            final int leftColumnIndex = (int)getCol();
+            final int rightColumnIndex = (int)getCol() + 1;
+            
             //initialize the column swap
-            BoardHelper.startSwap(getBoard(), (int)getCol(), (int)getCol() + 1);
+            BoardHelper.startSwap(getBoard(), leftColumnIndex, rightColumnIndex);
+            
+            //find which columns are at the index
+            final int leftColumnValue = getColumnOrderValue(leftColumnIndex);
+            final int rightColumnValue = getColumnOrderValue(rightColumnIndex);
+            
+            //now swap the values
+            columnOrder.set(rightColumnIndex, leftColumnValue);
+            columnOrder.set(leftColumnIndex, rightColumnValue);
+            
+            //flip the direction facing
+            setFront(!hasFront());
+
+            //change the animation
+            if (hasFront())
+            {
+                super.setAnimation(Player.ANIMATION_KEY_ROTATE_BACK);
+                super.resetAnimation();
+            }
+            else
+            {
+                super.setAnimation(Player.ANIMATION_KEY_ROTATE_FRONT);
+                super.resetAnimation();
+            }
             
             //we were successful
             return true;
@@ -89,6 +132,35 @@ public abstract class Player extends Entity implements IElement, IPlayer
             //we can't switch columns at the moment
             return false;
         }
+    }
+    
+    /**
+     * Get the column value of the specified index
+     * @param index Index where we want the value
+     * @return The column value of the specified index
+     */
+    protected int getColumnOrderValue(final int index)
+    {
+        return columnOrder.get(index);
+    }
+    
+    /**
+     * Get the index of the columns order list to find where a column is.
+     * @param column Column we are searching for
+     * @return The index where the column is found
+     * @throws Exception If the index is not found an exception will be throws
+     */
+    protected int getColumnOrderIndex(final int column) throws Exception
+    {
+        for (int index = 0; index < columnOrder.size(); index++)
+        {
+            //if this value is the column, we found the index
+            if (columnOrder.get(index) == column)
+                return index;
+        }
+        
+        //throw exception if the column was not found
+        throw new Exception("Column was not found " + column);
     }
     
     /**
@@ -116,12 +188,16 @@ public abstract class Player extends Entity implements IElement, IPlayer
     public abstract void update(final Engine engine) throws Exception;
     
     /**
-     * Update the board and check if we lost
+     * Update the board and check if we lost.<br>
+     * Also update the player animation
      * @param engine Object containing all game elements
      * @throws Exception 
      */
-    protected void updateBoard(final Engine engine) throws Exception
+    protected void updateMisc(final Engine engine) throws Exception
     {
+        //update player animation
+        updateAnimation(engine.getMain().getTime());
+        
         //update the board
         getBoard().update(engine);
         
@@ -206,6 +282,12 @@ public abstract class Player extends Entity implements IElement, IPlayer
     @Override
     public void dispose()
     {
+        if (columnOrder != null)
+        {
+            columnOrder.clear();
+            columnOrder = null;
+        }
+        
         if (board != null)
         {
             board.dispose();

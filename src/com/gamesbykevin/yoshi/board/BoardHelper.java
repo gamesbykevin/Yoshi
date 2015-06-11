@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * This class will contain custom methods to help the board
+ * This class will contain custom methods to help with the board
  * @author GOD
  */
 public final class BoardHelper 
@@ -101,9 +101,12 @@ public final class BoardHelper
             //get the current piece
             final Piece piece = pieces.get(i);
             
-            //if not placed or frozen, we have falling pieces
-            if (!piece.isFrozen() && !piece.isPlaced())
-                return true;
+            //we don't want these pieces
+            if (piece.isPlaced() || piece.isYoshi() || piece.isDestroyed() || piece.isFrozen())
+                continue;
+            
+            //if none of the above is true, we have a falling piece
+            return true;
         }
         
         //we did not find any falling pieces
@@ -121,9 +124,16 @@ public final class BoardHelper
             //get the current piece
             final Piece piece = pieces.get(i);
             
-            //if at first row, set frozen false
-            if (piece.getRow() == 0)
-                piece.setFrozen(false);
+            //only worried about frozen pieces
+            if (!piece.isFrozen())
+                continue;
+            
+            //only worried about pieces in the very first row
+            if (piece.getRow() != 0)
+                continue;
+            
+            //unfreeze
+            piece.setFrozen(false);
         }
     }
     
@@ -198,16 +208,16 @@ public final class BoardHelper
      */
     public static boolean canSwapColumns(final List<Piece> pieces)
     {
-        //if we have yoshi we can't swap columns
-        if (hasYoshi(pieces))
-            return false;
-        
         //if we are currently swapping columns, we can't do it again
         if (isSwappingColumns(pieces))
             return false;
         
         //if we currently have destroyed pieces
         if (hasDestroyedPiece(pieces))
+            return false;
+        
+        //if we have yoshi we can't swap columns
+        if (hasYoshi(pieces))
             return false;
         
         //if none of the above are an issue we can swap columns
@@ -317,7 +327,7 @@ public final class BoardHelper
     
     /**
      * Swap the pieces.<br>
-     * Move the piece's column towards the target column
+     * Move the pieces column towards the target column
      * @param pieces The pieces we want to swap
      * @param startColumnX The x-coordinate where the first column is. We need to calculate the x-coordinate.
      */
@@ -335,7 +345,6 @@ public final class BoardHelper
             //swap the piece
             swapPiece(piece, startColumnX);
         }
-        
     }
     
     /**

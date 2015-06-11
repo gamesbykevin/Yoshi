@@ -70,8 +70,8 @@ public final class Human extends Player
         if (getBoard().hasLost())
             return;
         
-        //update animation
-        super.updateAnimation(engine.getMain().getTime());
+        //update the extra things
+        super.updateMisc(engine);
         
         //get the keyboard input
         final Keyboard keyboard = engine.getKeyboard();
@@ -111,28 +111,9 @@ public final class Human extends Player
             //remove key released
             keyboard.removeKeyReleased(KeyEvent.VK_SPACE);
             
-            //if switching the columns was successful
-            if (switchColumns())
-            {
-                //flip the direction facing
-                setFront(!hasFront());
-
-                //change the animation
-                if (hasFront())
-                {
-                    super.setAnimation(Player.ANIMATION_KEY_ROTATE_BACK);
-                    super.resetAnimation();
-                }
-                else
-                {
-                    super.setAnimation(Player.ANIMATION_KEY_ROTATE_FRONT);
-                    super.resetAnimation();
-                }
-            }
+            //switch columns
+            switchColumns();
         }
-        
-        //update the board
-        super.updateBoard(engine);
     }
     
     @Override

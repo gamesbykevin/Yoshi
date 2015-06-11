@@ -24,6 +24,12 @@ public final class Board extends Sprite implements IElement
     public static final int ROWS = 9;
     public static final int COLUMNS = 4;
     
+    //the scoring values
+    public static final int SCORE_NONE = 0;
+    public static final int SCORE_YOSHI_PIECE = 50;
+    public static final int SCORE_PIECE_MATCH = 10;
+    public static final int SCORE_PIECE_HEIGHT = -5;
+    
     //the pieces in the game
     private List<Piece> pieces;
     
@@ -31,7 +37,7 @@ public final class Board extends Sprite implements IElement
     private Timer timer;
     
     //the amount of time to wait to apply gravity
-    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(400L);
+    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(60L);
     
     /**
      * The amount of time at which we apply gravity when we have a yoshi
@@ -275,7 +281,7 @@ public final class Board extends Sprite implements IElement
         {
             //swap the pieces that are not yet at the target column
             BoardHelper.swapPieces(getPieces(), getStartPieceColumnX());
-            
+
             //no need to continue
             return;
         }
