@@ -33,6 +33,9 @@ public abstract class Player extends Entity implements IElement, IPlayer
     //default animation delay
     protected static final long DELAY_DEFAULT = Timers.toNanoSeconds(25L);
     
+    //increase the level every x amount of yoshis created
+    private static final int YOSHIS_PER_LEVEL = 10;
+    
     /**
      * The amount of time to deduct from your opponent when matching pieces
      */
@@ -279,6 +282,10 @@ public abstract class Player extends Entity implements IElement, IPlayer
                 //increase the yoshi stat
                 stat = getStats().getStatYoshi();
                 stat.setValue(stat.getValue() + 1);
+                
+                //increase the level, every x yoshi's
+                if (stat.getValue() % YOSHIS_PER_LEVEL == 0)
+                    getStats().getStatLevel().setValue(getStats().getStatLevel().getValue() + 1);
             }
             
             //if attack mode we want to heal ourselves and damage the opponent

@@ -29,12 +29,10 @@ public final class Players implements IElement
     public static final int MODE_SINGLE_PLAYER_CPU = 4;
     
     //the delay for high score mode (3 minutes)
-    private static final long MODE_HIGH_SCORE_DELAY = Timers.toNanoSeconds(5000L);
-    //private static final long MODE_HIGH_SCORE_DELAY = Timers.toNanoSeconds(3);
+    private static final long MODE_HIGH_SCORE_DELAY = Timers.toNanoSeconds(3);
     
-    //the remaining time for attack mode (5 minutes
-    private static final long MODE_ATTACK_DELAY = Timers.toNanoSeconds(15000L);
-    //private static final long MODE_ATTACK_DELAY = Timers.toNanoSeconds(5);
+    //the remaining time for attack mode (5 minutes)
+    private static final long MODE_ATTACK_DELAY = Timers.toNanoSeconds(5);
     
     //the players playing the game
     private List<Player> players;
@@ -166,7 +164,7 @@ public final class Players implements IElement
      */
     public static boolean isMultiPlayer(final int modeIndex)
     {
-        return (modeIndex != MODE_SINGLE_PLAYER_HUMAN && modeIndex != MODE_SINGLE_PLAYER_HUMAN);
+        return (modeIndex != MODE_SINGLE_PLAYER_HUMAN && modeIndex != MODE_SINGLE_PLAYER_CPU);
     }
     
     @Override
