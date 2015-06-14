@@ -9,15 +9,21 @@ import com.gamesbykevin.framework.base.Sprite;
  */
 public abstract class Entity extends Sprite
 {
+    /**
+     * No time delay
+     */
+    public static final long DELAY_NONE = 0;
+    
+    /**
+     * No count
+     */
+    public static final int NO_COUNT = 0;
+    
     protected Entity()
     {
         super.createSpriteSheet();
     }
     
-    /**
-     * No time delay
-     */
-    public static final long DELAY_NONE = 0;
     
     /**
      * Reset the current animation

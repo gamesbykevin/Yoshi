@@ -5,9 +5,11 @@ import com.gamesbykevin.yoshi.board.Board;
 import com.gamesbykevin.yoshi.board.BoardHelper;
 import com.gamesbykevin.yoshi.engine.Engine;
 import com.gamesbykevin.yoshi.entity.Entity;
+import com.gamesbykevin.yoshi.player.stats.Stats;
 import com.gamesbykevin.yoshi.shared.IElement;
-import java.awt.Color;
+import com.gamesbykevin.yoshi.player.stats.Stat;
 
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -31,6 +33,26 @@ public abstract class Player extends Entity implements IElement, IPlayer
     //default animation delay
     protected static final long DELAY_DEFAULT = Timers.toNanoSeconds(25L);
     
+    /**
+     * The amount of time to deduct from your opponent when matching pieces
+     */
+    protected static final long DAMAGE_DELAY_MATCH = Timers.toNanoSeconds(5000L);
+    
+    /**
+     * The amount of time to add to your own timer when matching pieces
+     */
+    protected static final long HEAL_DELAY_MATCH = Timers.toNanoSeconds(1000L);
+    
+    /**
+     * The amount of time to deduct from your opponent when creating a yoshi
+     */
+    protected static final long DAMAGE_DELAY_YOSHI = Timers.toNanoSeconds(7000L);
+    
+    /**
+     * The amount of time to add to your own timer when creating a yoshi
+     */
+    protected static final long HEAL_DELAY_YOSHI = Timers.toNanoSeconds(2000L);
+    
     //the direction the player is facing
     private boolean front = true;
     
@@ -47,6 +69,10 @@ public abstract class Player extends Entity implements IElement, IPlayer
     public static final int MULTI_PLAYER_2_START_X = MULTI_PLAYER_1_START_X + 300;
     public static final int MULTI_PLAYER_2_START_Y = MULTI_PLAYER_1_START_Y;
     
+    public static final int INDEX_DIFFICULTY_EASY = 0;
+    public static final int INDEX_DIFFICULTY_MEDIUM = 1;
+    public static final int INDEX_DIFFICULTY_HARD = 2;
+    
     //the players starting column
     private static final int START_COLUMN = 1;
     
@@ -57,12 +83,15 @@ public abstract class Player extends Entity implements IElement, IPlayer
     //list of columns and the order they currently reside (needed so api will know which columns to switch)
     private List<Integer> columnOrder;
     
-    public Player(final Image image, final boolean multiplayer)
+    //our object containing the game stats
+    private Stats stats;
+    
+    public Player(final Image image, final boolean multiplayer, final int difficultyIndex) throws Exception
     {
         //set y-coordinate
         super.setY(this.startY);
         
-        this.board = new Board();
+        this.board = new Board(difficultyIndex);
         this.board.setImage(image);
         
         //store the spritesheet image
@@ -198,18 +227,122 @@ public abstract class Player extends Entity implements IElement, IPlayer
         //update player animation
         updateAnimation(engine.getMain().getTime());
         
+        //check if we have any destroyed pieces
+        final boolean hasDestroyedPieces = BoardHelper.hasDestroyedPieces(getBoard().getPieces());
+        
+        //do we have a yoshi
+        final boolean hasYoshi = BoardHelper.hasYoshi(getBoard().getPieces());
+        
         //update the board
         getBoard().update(engine);
         
+        //if we now have destroyed pieces
+        if (!hasDestroyedPieces && BoardHelper.hasDestroyedPieces(getBoard().getPieces()))
+        {
+            //get the number of destroyed pieces
+            int count = BoardHelper.getDestroyedPieceCount(getBoard().getPieces());
+            
+            //update the score stats
+            Stat stat = getStats().getStatScore();
+            stat.setValue(stat.getValue() + (count * Board.SCORE_PIECE_MATCH));
+            
+            //if attack mode we want to heal ourselves and damage the opponent
+            if (engine.getManager().getPlayers().hasModeAttack())
+            {
+                //get the time remaining
+                final long remaining = getStats().getGameTimer().getRemaining();
+                
+                //now add the heal time
+                getStats().getGameTimer().setRemaining(remaining + HEAL_DELAY_MATCH);
+                
+                //update description
+                getStats().updateGameTimerDesc();
+                
+                //now damage opponent
+                engine.getManager().getPlayers().damageOpponent(this, DAMAGE_DELAY_MATCH);
+            }
+        }
+        
+        //if we now have a yoshi
+        if (!hasYoshi && BoardHelper.hasYoshi(getBoard().getPieces()))
+        {
+            //how big the yoshi is
+            int yoshiSize = BoardHelper.getYoshiSize(getBoard().getPieces());
+            
+            //update the score stats
+            Stat stat = getStats().getStatScore();
+            stat.setValue(stat.getValue() + (yoshiSize * Board.SCORE_YOSHI_PIECE));
+            
+            //only track this stat if it exists
+            if (getStats().getStatYoshi() != null)
+            {
+                //increase the yoshi stat
+                stat = getStats().getStatYoshi();
+                stat.setValue(stat.getValue() + 1);
+            }
+            
+            //if attack mode we want to heal ourselves and damage the opponent
+            if (engine.getManager().getPlayers().hasModeAttack())
+            {
+                //get the time remaining
+                final long remaining = getStats().getGameTimer().getRemaining();
+                
+                //now add the heal time
+                getStats().getGameTimer().setRemaining(remaining + (HEAL_DELAY_YOSHI * yoshiSize));
+                
+                //update description
+                getStats().updateGameTimerDesc();
+                
+                //now damage opponent
+                engine.getManager().getPlayers().damageOpponent(this, (DAMAGE_DELAY_YOSHI * yoshiSize));
+            }
+        }
+        
+        //if the game is over, record our result
+        if (getBoard().hasGameOver())
+            setGameResult(getBoard().hasLost());
+        
+        if (getStats() != null)
+        {
+            //update the stats
+            getStats().update(engine);
+        }
+    }
+    
+    /**
+     * Our game is over, set the result.<br>
+     * We will also display the win/lost animation.
+     * @param lose True if the player controlling this board lost, false if they won
+     */
+    public void setGameResult(final boolean lose)
+    {
+        //update the result on the board
+        getBoard().setGameResult(lose);
+        
+        //show the correct animation if we won/lose
         if (getBoard().hasLost())
         {
             //set the lose animation
             super.setAnimation(Player.ANIMATION_KEY_LOSE);
-            
-            //set the coordinates in middle of the board
-            super.setX(getBoard().getX() - (getWidth() / 2));
-            super.setY(getBoard().getY() - (getHeight() / 2));
         }
+        else
+        {
+            //set the winning animation
+            super.setAnimation(Player.ANIMATION_KEY_VICTORY);
+        }
+
+        //set the coordinates in middle of the board
+        super.setX(getBoard().getX() - (getWidth() / 2));
+        super.setY(getBoard().getY() - (getHeight() / 2));
+    }
+    
+    /**
+     * Get our stats container
+     * @return The stats container with all displayed stats on the screen
+     */
+    public Stats getStats()
+    {
+        return this.stats;
     }
     
     /**
@@ -279,6 +412,16 @@ public abstract class Player extends Entity implements IElement, IPlayer
         return this.board;
     }
     
+    /**
+     * Create Stats container
+     * @param font The font for our Stats
+     * @param multiplayer Is this multi-player
+     */
+    public void createStats(final Font font, final boolean multiplayer)
+    {
+        this.stats = new Stats(font, getStartX(), getStartY(), multiplayer);
+    }
+    
     @Override
     public void dispose()
     {
@@ -293,6 +436,12 @@ public abstract class Player extends Entity implements IElement, IPlayer
             board.dispose();
             board = null;
         }
+        
+        if (stats != null)
+        {
+            stats.dispose();
+            stats = null;
+        }
     }
     
     @Override
@@ -303,5 +452,8 @@ public abstract class Player extends Entity implements IElement, IPlayer
         
         //draw the player info
         super.draw(graphics);
+        
+        //display stats on-screen
+        getStats().render(graphics);
     }
 }

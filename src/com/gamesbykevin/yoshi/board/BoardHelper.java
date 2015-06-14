@@ -1,7 +1,7 @@
 package com.gamesbykevin.yoshi.board;
 
 import com.gamesbykevin.yoshi.board.piece.Piece;
-
+import com.gamesbykevin.yoshi.entity.Entity;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,21 +72,109 @@ public final class BoardHelper
     public static final double ROW_DROP = 0.5;
     
     /**
+     * Does this board have any placed pieces
+     * @param board The board we want to check
+     * @return true if at least 1 piece is placed, false otherwise
+     */
+    public static boolean hasPlacedPieces(final Board board)
+    {
+        for (int i = 0; i < board.getPieces().size(); i++)
+        {
+            //get the current piece
+            final Piece piece = board.getPieces().get(i);
+            
+            //if any piece is placed, yoshi, or destoryed, there are placed pieces
+            if (piece.isPlaced() || piece.isYoshi() || piece.isDestroyed())
+                return true;
+        }
+        
+        //we don't have any placed pieces
+        return false;
+    }
+    
+    /**
      * Do we have at least 1 destroyed piece?
      * @param pieces List of pieces to check
      * @return true = yes, false = no
      */
-    public static boolean hasDestroyedPiece(final List<Piece> pieces)
+    public static boolean hasDestroyedPieces(final List<Piece> pieces)
     {
+        return (getDestroyedPieceCount(pieces) > Entity.NO_COUNT);
+    }
+    
+    /**
+     * Get the count of destroyed pieces
+     * @param pieces List of pieces to check
+     * @return The total number of pieces flagged as destroyed
+     */
+    public static int getDestroyedPieceCount(final List<Piece> pieces)
+    {
+        //keep track of the count
+        int count = 0;
+        
+        //check each piece
         for (int i = 0; i < pieces.size(); i++)
         {
-            //if this piece is destroyed return true
+            //if this piece is destroyed increase count
             if (pieces.get(i).isDestroyed())
-                return true;
+                count++;
         }
         
-        //we don't have any destroyed pieces
-        return false;
+        //return result
+        return count;
+    }
+    
+    /**
+     * Populate the board with random pieces
+     * @param board The board we are adding pieces to
+     * @param random Object used to make random decisions
+     */
+    public static void populateBoard(final Board board, final Random random)
+    {
+        //create new list of options
+        List<Integer> options = new ArrayList<>();
+        
+        for (int row = Board.ROWS - 3; row < Board.ROWS; row++)
+        {
+            for (int col = 0; col < Board.COLUMNS; col++)
+            {
+                //clear the options
+                options.clear();
+                
+                //get the pieces to the north an south
+                Piece north = board.getPiece(col, row - 1, Piece.NO_ID);
+                Piece south = board.getPiece(col, row + 1, Piece.NO_ID);
+                
+                //check if we can use this piece
+                if ((north == null || north.getType() != Piece.TYPE_BOO) && (south == null || south.getType() != Piece.TYPE_BOO))
+                    options.add(Piece.TYPE_BOO);
+                if ((north == null || north.getType() != Piece.TYPE_GOOMBA) && (south == null || south.getType() != Piece.TYPE_GOOMBA))
+                    options.add(Piece.TYPE_GOOMBA);
+                if ((north == null || north.getType() != Piece.TYPE_PLANT) && (south == null || south.getType() != Piece.TYPE_PLANT))
+                    options.add(Piece.TYPE_PLANT);
+                if ((north == null || north.getType() != Piece.TYPE_SQUID) && (south == null || south.getType() != Piece.TYPE_SQUID))
+                    options.add(Piece.TYPE_SQUID);
+                
+                //create a random piece of type
+                Piece piece = new Piece(options.get(random.nextInt(options.size())));
+                
+                //set the location
+                piece.setCol(col);
+                piece.setRow(row);
+                
+                //mark the piece as placed
+                piece.placePiece();
+                
+                //set the y-coordinate
+                piece.setY(board.getStartPieceRowY() + (row * (DROP_PIXEL_DISTANCE * 2)));
+
+                //set the x-coordinate
+                piece.setX(board.getStartPieceColumnX() + (col * BoardHelper.COLUMN_PIXEL_WIDTH));
+                
+                //add piece to the board
+                board.add(piece);
+            }
+        }
     }
     
     /**
@@ -213,7 +301,7 @@ public final class BoardHelper
             return false;
         
         //if we currently have destroyed pieces
-        if (hasDestroyedPiece(pieces))
+        if (hasDestroyedPieces(pieces))
             return false;
         
         //if we have yoshi we can't swap columns
@@ -598,7 +686,7 @@ public final class BoardHelper
                 board.remove(piece);
                 
                 //now that we have created the yoshi and no more pieces left, adjust the time delay
-                board.getTimer().setReset(Board.DELAY_GRAVITY);
+                board.getTimer().setReset(board.getDelayDefault());
                 board.getTimer().reset();
             }
             else

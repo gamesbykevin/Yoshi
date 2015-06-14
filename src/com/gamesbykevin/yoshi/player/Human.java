@@ -15,9 +15,9 @@ import java.awt.event.KeyEvent;
  */
 public final class Human extends Player
 {
-    public Human(final Image image, final boolean multiplayer)
+    public Human(final Image image, final boolean multiplayer, final int difficultyIndex) throws Exception
     {
-        super(image, multiplayer);
+        super(image, multiplayer, difficultyIndex);
     }
     
     @Override
@@ -67,9 +67,6 @@ public final class Human extends Player
     @Override
     public void update(final Engine engine) throws Exception
     {
-        if (getBoard().hasLost())
-            return;
-        
         //update the extra things
         super.updateMisc(engine);
         
@@ -98,10 +95,10 @@ public final class Human extends Player
                 super.setCol(super.getCol() + 1);
             }
         }
-        else if (keyboard.hasKeyReleased(KeyEvent.VK_DOWN))
+        else if (keyboard.hasKeyPressed(KeyEvent.VK_DOWN))
         {
             //remove key released
-            keyboard.removeKeyReleased(KeyEvent.VK_DOWN);
+            keyboard.removeKeyPressed(KeyEvent.VK_DOWN);
             
             //force gravity to be applied
             getBoard().applyGravity();

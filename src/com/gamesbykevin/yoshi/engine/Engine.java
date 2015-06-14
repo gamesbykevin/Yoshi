@@ -4,6 +4,7 @@ import com.gamesbykevin.yoshi.resources.Resources;
 import com.gamesbykevin.yoshi.main.Main;
 import com.gamesbykevin.yoshi.manager.Manager;
 import com.gamesbykevin.yoshi.menu.CustomMenu;
+import com.gamesbykevin.yoshi.resources.*;
 import com.gamesbykevin.yoshi.shared.Shared;
 
 import com.gamesbykevin.framework.input.*;
@@ -42,7 +43,7 @@ public final class Engine implements KeyListener, MouseMotionListener, MouseList
     private final long seed = System.nanoTime();
     
     //the game font size
-    private static final float GAME_FONT_SIZE = 14f;
+    public static final float GAME_FONT_SIZE = 14f;
     
     /**
      * The Engine that contains the game/menu objects
@@ -158,6 +159,10 @@ public final class Engine implements KeyListener, MouseMotionListener, MouseList
                     {
                         createManager();
                         getManager().reset(this);
+                        
+                        //set the game font
+                        this.font = getResources().getGameFont(GameFont.Keys.Default);
+                        this.font = getFont().deriveFont(GAME_FONT_SIZE);
                     }
 
                     //update main game logic
@@ -222,17 +227,25 @@ public final class Engine implements KeyListener, MouseMotionListener, MouseList
     }
     
     /**
+     * If the font isn't set, set the default font
+     * @param graphics Object used to render content
+     */
+    private void createDefaultFont(final Graphics graphics)
+    {
+        this.font = graphics.getFont().deriveFont(Font.BOLD, GAME_FONT_SIZE);
+    }
+    
+    /**
      * Draw our game to the Graphics object whether resources are still loading or the game is intact
-     * @param graphics
-     * @return Graphics
+     * @param graphics Object used to render content
      * @throws Exception 
      */
     @Override
-    public void render(Graphics graphics) throws Exception
+    public void render(final Graphics graphics) throws Exception
     {
-        //get default font
+        //set default font, if not set
         if (getFont() == null)
-            font = graphics.getFont().deriveFont(Font.BOLD, GAME_FONT_SIZE);
+            createDefaultFont(graphics);
         
         if (getMenu() != null)
         {

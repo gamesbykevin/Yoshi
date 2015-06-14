@@ -6,6 +6,7 @@ import com.gamesbykevin.framework.util.*;
 import com.gamesbykevin.yoshi.board.piece.Piece;
 import com.gamesbykevin.yoshi.engine.Engine;
 import com.gamesbykevin.yoshi.entity.Entity;
+import com.gamesbykevin.yoshi.player.Player;
 import com.gamesbykevin.yoshi.shared.IElement;
 
 import java.awt.Graphics;
@@ -33,14 +34,16 @@ public final class Board extends Sprite implements IElement
     public static final int SCORE_PIECE_HEIGHT = -5;
     public static final int SCORE_BOTTOM_SHELL_HEIGHT = -7;
     
+    //the time delay for each difficulty in which we will apply gravity
+    private static final long DELAY_DIFFICULTY_EASY = Timers.toNanoSeconds(900L);
+    private static final long DELAY_DIFFICULTY_MEDIUM = Timers.toNanoSeconds(450L);
+    private static final long DELAY_DIFFICULTY_HARD = Timers.toNanoSeconds(125L);
+    
     //the pieces in the game
     private List<Piece> pieces;
     
     //the timer to determine how often we apply gravity
     private Timer timer;
-    
-    //the amount of time to wait to apply gravity
-    protected static final long DELAY_GRAVITY = Timers.toNanoSeconds(500L);
     
     /**
      * The amount of time at which we apply gravity when we have a yoshi
@@ -50,12 +53,18 @@ public final class Board extends Sprite implements IElement
     //do we have a losing board
     private boolean lose = false;
     
+    //is the game over
+    private boolean gameover = false;
+    
     /**
      * The starting coordinates where the pieces spawn on the board
      */
     private int startPieceColumnX, startPieceRowY;
     
-    public Board()
+    //the default time delay
+    private final long delay;
+    
+    public Board(final int difficultyIndex) throws Exception
     {
         //set the bounds
         super.setBounds(0, COLUMNS - 1, 0, ROWS - 1);
@@ -63,8 +72,36 @@ public final class Board extends Sprite implements IElement
         //create a new list for the pieces
         this.pieces = new ArrayList<>();
         
-        //create timer 
-        this.timer = new Timer(DELAY_GRAVITY);
+        //create gravity timer with a time delay dependant on the diffuculty
+        switch (difficultyIndex)
+        {
+            case Player.INDEX_DIFFICULTY_EASY:
+                this.delay = DELAY_DIFFICULTY_EASY;
+                break;
+                
+            case Player.INDEX_DIFFICULTY_MEDIUM:
+                this.delay = DELAY_DIFFICULTY_MEDIUM;
+                break;
+                
+            case Player.INDEX_DIFFICULTY_HARD:
+                this.delay = DELAY_DIFFICULTY_HARD;
+                break;
+            
+            default:
+                throw new Exception("Difficulty Index not found " + difficultyIndex);
+        }
+        
+        //create timer with assigned delay
+        this.timer = new Timer(this.delay);
+    }
+    
+    /**
+     * Get the time delay for when to apply gravity to the pieces
+     * @return The time delay in nano seconds
+     */
+    protected long getDelayDefault()
+    {
+        return this.delay;
     }
     
     /**
@@ -224,6 +261,7 @@ public final class Board extends Sprite implements IElement
             getTimer().setRemaining(Entity.DELAY_NONE);
     }
     
+    
     /**
      * Did we lose?
      * @return true if the board has filled up and the game is over, false otherwise
@@ -234,19 +272,28 @@ public final class Board extends Sprite implements IElement
     }
     
     /**
-     * Is the game over for this board?
-     * @param lose true=yes, false=no
+     * Now that our game is over, record the result
+     * @param lose True if the player controlling this board lost, false if they won
      */
-    private void setLose(final boolean lose)
+    public void setGameResult(final boolean lose)
     {
+        //store our win/lose result
         this.lose = lose;
+        
+        //flag the game as over
+        this.gameover = true;
+    }
+    
+    public boolean hasGameOver()
+    {
+        return this.gameover;
     }
     
     @Override
     public void update(final Engine engine) throws Exception
     {
-        //no need to continue if we lost
-        if (hasLost())
+        //no need to continue if the game is over
+        if (hasGameOver())
             return;
         
         //if we don't have any starting pieces, we need to spawn them
@@ -270,7 +317,7 @@ public final class Board extends Sprite implements IElement
         }
         
         //if there are pieces that are destroyed we need to handle those
-        if (BoardHelper.hasDestroyedPiece(getPieces()))
+        if (BoardHelper.hasDestroyedPieces(getPieces()))
         {
             //if we have a destroyed piece pause everything else
             BoardHelper.manageDestroyedPieces(this, engine.getMain().getTime());
@@ -340,9 +387,12 @@ public final class Board extends Sprite implements IElement
             }
         }
         
-        //check if we have a losing board
-        setLose(BoardHelper.hasLosingBoard(getPieces()));
+        //check if we have a losing board, and if so set the game result
+        if (BoardHelper.hasLosingBoard(getPieces()))
+            setGameResult(true);
     }
+    
+    
     
     @Override
     public void render(final Graphics graphics) throws Exception

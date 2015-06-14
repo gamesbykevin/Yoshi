@@ -69,6 +69,21 @@
             <option>Off</option>
             <option>On</option>
         </options>
+        
+        <options name="Difficulty: " id="Difficulty">
+            <option>Easy</option>
+            <option>Medium</option>
+            <option>Hard</option>
+        </options>
+        
+        <options name="Mode: " id="Mode">
+            <option>Single Player 'Human'</option>
+            <option>Vs - High Score</option>
+            <option>Vs - Clear Board</option>
+            <option>Vs - Attack</option>
+            <option>Single Player 'Cpu'</option>
+        </options>
+        
         <options name="Go Back" next="MainTitle" id="MainTitle"></options>
     </layer>
     <layer id="Controls1" next="MainTitle">

@@ -23,10 +23,10 @@ public final class Cpu extends Player
     //the move timer
     private Timer timer;
     
-    /**
-     * The amount of time to wait between each move
-     */
-    private static final long MOVE_DELAY = Timers.toNanoSeconds(250L);
+    //the time delay for each difficulty
+    private static final long DELAY_DIFFICULTY_EASY   = Timers.toNanoSeconds(500L);
+    private static final long DELAY_DIFFICULTY_MEDIUM = Timers.toNanoSeconds(250L);
+    private static final long DELAY_DIFFICULTY_HARD   = Timers.toNanoSeconds(125L);
     
     /*
      * The expected number of falling pieces, while locating our target(S)
@@ -38,12 +38,28 @@ public final class Cpu extends Player
      */
     private static final int COUNT_NONE = 0;
     
-    public Cpu(final Image image, final boolean multiplayer)
+    public Cpu(final Image image, final boolean multiplayer, final int difficultyIndex) throws Exception
     {
-        super(image, multiplayer);
+        super(image, multiplayer, difficultyIndex);
         
-        //create timer
-        this.timer = new Timer(MOVE_DELAY);
+        //create timer with a time delay dependant on the diffuculty
+        switch (difficultyIndex)
+        {
+            case Player.INDEX_DIFFICULTY_EASY:
+                this.timer = new Timer(DELAY_DIFFICULTY_EASY);
+                break;
+                
+            case Player.INDEX_DIFFICULTY_MEDIUM:
+                this.timer = new Timer(DELAY_DIFFICULTY_MEDIUM);
+                break;
+                
+            case Player.INDEX_DIFFICULTY_HARD:
+                this.timer = new Timer(DELAY_DIFFICULTY_HARD);
+                break;
+            
+            default:
+                throw new Exception("Difficulty Index not found " + difficultyIndex);
+        }
     }
     
     @Override
@@ -93,9 +109,6 @@ public final class Cpu extends Player
     @Override
     public void update(final Engine engine) throws Exception
     {
-        if (getBoard().hasLost())
-            return;
-        
         //do we have falling pieces before updating
         final boolean hasFallingPiecesBefore = BoardHelper.hasFallingPieces(getBoard().getPieces());
         

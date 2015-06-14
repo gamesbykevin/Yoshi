@@ -1,18 +1,15 @@
 package com.gamesbykevin.yoshi.manager;
 
-import com.gamesbykevin.framework.util.Timers;
-import com.gamesbykevin.yoshi.player.*;
+import com.gamesbykevin.yoshi.player.Players;
 import com.gamesbykevin.yoshi.engine.Engine;
 import com.gamesbykevin.yoshi.menu.CustomMenu;
 import com.gamesbykevin.yoshi.menu.CustomMenu.*;
 import com.gamesbykevin.yoshi.resources.GameAudio;
 import com.gamesbykevin.yoshi.resources.GameFont;
 import com.gamesbykevin.yoshi.resources.GameImages;
-import com.gamesbykevin.yoshi.shared.Shared;
 
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +22,8 @@ public final class Manager implements IManager
     //background image to display
     private Image image;
     
-    //the players playing the game
-    private List<Player> players;
+    //the players in the game
+    private Players players;
     
     /**
      * Constructor for Manager, this is the point where we load any menu option configurations
@@ -37,37 +34,38 @@ public final class Manager implements IManager
     {
         //set the audio depending on menu setting
         engine.getResources().setAudioEnabled(engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Sound) == CustomMenu.SOUND_ENABLED);
-        
-        //create the list container of players
-        this.players = new ArrayList<>();
     }
     
     @Override
     public void reset(final Engine engine) throws Exception
     {
+        //get the difficulty
+        final int difficultyIndex = engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Difficulty);
+        
+        //get the game mode
+        final int modeIndex = engine.getMenu().getOptionSelectionIndex(LayerKey.Options, OptionKey.Mode);
+        
         //are we playing multi-player
-        final boolean multiplayer = true;
+        final boolean multiplayer = Players.isMultiPlayer(modeIndex);
+
+        //the background image will be determined by multi-player
+        this.image = engine.getResources().getGameImage((!multiplayer) ? GameImages.Keys.Background1Player : GameImages.Keys.Background2Player);
         
-        //remove any existing players
-        players.clear();
-        
-        if (!multiplayer)
+        if (players == null)
         {
-            //the background image
-            this.image = engine.getResources().getGameImage(GameImages.Keys.Background1Player);
-            
-            //create a new player and add to list
-            players.add(new Cpu(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer));
+            players = new Players(
+                modeIndex, 
+                difficultyIndex, 
+                engine.getResources().getGameImage(GameImages.Keys.Spritesheet),
+                engine.getResources().getGameFont(GameFont.Keys.Default),
+                engine.getRandom()
+            );
         }
-        else
-        {
-            //the background image
-            this.image = engine.getResources().getGameImage(GameImages.Keys.Background2Player);
-            
-            //create players and add to list
-            players.add(new Human(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer));
-            players.add(new Cpu(engine.getResources().getGameImage(GameImages.Keys.Spritesheet), multiplayer));
-        }
+    }
+    
+    public Players getPlayers()
+    {
+        return this.players;
     }
     
     /**
@@ -84,10 +82,10 @@ public final class Manager implements IManager
                 image = null;
             }
             
-            for (int i = 0; i < players.size(); i++)
+            if (players != null)
             {
-                players.get(i).dispose();
-                players.set(i, null);
+                players.dispose();
+                players = null;
             }
             
             //recycle objects
@@ -109,10 +107,7 @@ public final class Manager implements IManager
     {
         if (players != null)
         {
-            for (int i = 0; i < players.size(); i++)
-            {
-                players.get(i).update(engine);
-            }
+            players.update(engine);
         }
     }
     
@@ -127,10 +122,7 @@ public final class Manager implements IManager
         
         if (players != null)
         {
-            for (int i = 0; i < players.size(); i++)
-            {
-                players.get(i).render(graphics);
-            }
+            players.render(graphics);
         }
     }
 }
