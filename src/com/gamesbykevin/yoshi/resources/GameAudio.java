@@ -16,6 +16,10 @@ public final class GameAudio extends AudioManager
      */
     public enum Keys
     {
+        CreateYoshi0, CreateYoshi1, CreateYoshi2, CreateYoshi3,
+        CreateYoshi4, CreateYoshi5, CreateYoshi6, CreateYoshi7,
+        MatchPieces, MovePlayer, PlacePiece, 
+        SwapColumns, TopShellPlaced
     }
     
     public GameAudio() throws Exception

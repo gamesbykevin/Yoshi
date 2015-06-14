@@ -3,4 +3,17 @@
     <!--
     <sound id="Fill">resources/audio/game/fill.wav</sound>
     -->
+    <sound id="CreateYoshi0">resources/audio/game/sfx/createYoshi0Enemy.wav</sound>
+    <sound id="CreateYoshi1">resources/audio/game/sfx/createYoshi1Enemy.wav</sound>
+    <sound id="CreateYoshi2">resources/audio/game/sfx/createYoshi2Enemy.wav</sound>
+    <sound id="CreateYoshi3">resources/audio/game/sfx/createYoshi3Enemy.wav</sound>
+    <sound id="CreateYoshi4">resources/audio/game/sfx/createYoshi4Enemy.wav</sound>
+    <sound id="CreateYoshi5">resources/audio/game/sfx/createYoshi5Enemy.wav</sound>
+    <sound id="CreateYoshi6">resources/audio/game/sfx/createYoshi6Enemy.wav</sound>
+    <sound id="CreateYoshi7">resources/audio/game/sfx/createYoshi7Enemy.wav</sound>
+    <sound id="MatchPieces">resources/audio/game/sfx/matchPieces.wav</sound>
+    <sound id="MovePlayer">resources/audio/game/sfx/movePlayer.wav</sound>
+    <sound id="PlacePiece">resources/audio/game/sfx/placePiece.wav</sound>
+    <sound id="SwapColumns">resources/audio/game/sfx/swapColumns.wav</sound>
+    <sound id="TopShellPlaced">resources/audio/game/sfx/topShellPlaced.wav</sound>
 </sounds>

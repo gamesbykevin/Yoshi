@@ -13,22 +13,22 @@
         <force>true</force>
         <pause>false</pause>
         <duration>2000</duration>
-        <image>resources/images/menu/untitled.png</image>
+        <image>resources/images/menu/yoshi.png</image>
     </layer>
     <layer id="Credits" next="MainTitle">
         <transition>SCROLL_VERTICAL_NORTH</transition>
         <force>true</force>
         <pause>false</pause>
         <duration>5000</duration>
-        <image>resources/images/menu/untitled.png</image>
+        <image>resources/images/menu/credits.png</image>
     </layer>
     <layer id="MainTitle">
         <transition>NONE</transition>
         <force>false</force>
         <pause>true</pause>
         <duration>10000</duration>
-        <image>resources/images/menu/untitled.png</image>
-        <optionContainerRatio>0.5</optionContainerRatio>
+        <image>resources/images/menu/background.png</image>
+        <optionContainerRatio>0.75</optionContainerRatio>
         <optionBorderThickness>5</optionBorderThickness>
         <title>Yoshi</title>
         <backgroundMusicLocation></backgroundMusicLocation>
@@ -44,15 +44,15 @@
         <force>false</force>
         <pause>true</pause>
         <duration></duration>
-        <image>resources/images/menu/untitled.png</image>
+        <image>resources/images/menu/credits.png</image>
     </layer>
     <layer id="Options">
         <transition>NONE</transition>
         <force>false</force>
         <pause>true</pause>
         <duration>10000</duration>
-        <image>resources/images/menu/untitled.png</image>
-        <optionContainerRatio>0.5</optionContainerRatio>
+        <image>resources/images/menu/background.png</image>
+        <optionContainerRatio>0.75</optionContainerRatio>
         <optionBorderThickness>5</optionBorderThickness>
         <title>Options</title>
         <backgroundMusicLocation></backgroundMusicLocation>
@@ -69,13 +69,11 @@
             <option>Off</option>
             <option>On</option>
         </options>
-        
         <options name="Difficulty: " id="Difficulty">
             <option>Easy</option>
             <option>Medium</option>
             <option>Hard</option>
         </options>
-        
         <options name="Mode: " id="Mode">
             <option>Single Player 'Human'</option>
             <option>Vs - High Score</option>
@@ -91,14 +89,35 @@
         <force>false</force>
         <pause>true</pause>
         <duration></duration>
-        <image>resources/images/menu/untitled.png</image>
+        <image>resources/images/menu/controls.png</image>
     </layer>
-    <layer id="Instructions1" next="MainTitle">
+    <layer id="Instructions1" next="Instructions2">
         <transition>NONE</transition>
         <force>false</force>
         <pause>true</pause>
         <duration></duration>
-        <image>resources/images/menu/untitled.png</image>
+        <image>resources/images/menu/instructions1.png</image>
+    </layer>
+    <layer id="Instructions2" next="Instructions3">
+        <transition>NONE</transition>
+        <force>false</force>
+        <pause>true</pause>
+        <duration></duration>
+        <image>resources/images/menu/instructions2.png</image>
+    </layer>
+    <layer id="Instructions3" next="Instructions4">
+        <transition>NONE</transition>
+        <force>false</force>
+        <pause>true</pause>
+        <duration></duration>
+        <image>resources/images/menu/instructions3.png</image>
+    </layer>
+    <layer id="Instructions4" next="MainTitle">
+        <transition>NONE</transition>
+        <force>false</force>
+        <pause>true</pause>
+        <duration></duration>
+        <image>resources/images/menu/instructions4.png</image>
     </layer>
     <layer id="GameStart">
         <!-- THIS LAYER IS INTENTIONALLY LEFT BLANK, THIS IS WHERE MAIN GAMEPLAY WILL START -->
@@ -109,7 +128,7 @@
         <pause>true</pause>
         <duration></duration>
         <image></image>
-        <optionContainerRatio>0.5</optionContainerRatio>
+        <optionContainerRatio>0.75</optionContainerRatio>
         <optionBorderThickness>5</optionBorderThickness>
         <title>Options</title>
         <backgroundMusicLocation></backgroundMusicLocation>
@@ -135,7 +154,7 @@
         <pause>true</pause>
         <duration></duration>
         <image></image>
-        <optionContainerRatio>0.5</optionContainerRatio>
+        <optionContainerRatio>0.75</optionContainerRatio>
         <optionBorderThickness>5</optionBorderThickness>
         <title>Reset?</title>
         <options name="Yes" next="CreateNewGame" id="CreateNewGame"></options>
@@ -149,7 +168,7 @@
         <pause>true</pause>
         <duration></duration>
         <image></image>
-        <optionContainerRatio>0.5</optionContainerRatio>
+        <optionContainerRatio>0.75</optionContainerRatio>
         <optionBorderThickness>5</optionBorderThickness>
         <title>Leave?</title>
         <options name="Yes" next="ExitGameConfirmed" id="MainTitle"></options>

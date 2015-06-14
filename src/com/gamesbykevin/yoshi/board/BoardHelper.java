@@ -103,6 +103,31 @@ public final class BoardHelper
     }
     
     /**
+     * Is there a top shell marked destroyed?
+     * @param pieces List of pieces to check
+     * @return true if a top shell is flagged destroyed, false otherwis
+     */
+    public static boolean hasDestroyedTopShell(final List<Piece> pieces)
+    {
+        //check each piece
+        for (int i = 0; i < pieces.size(); i++)
+        {
+            final Piece piece = pieces.get(i);
+            
+            //don't check if not destroyed
+            if (!piece.isDestroyed())
+                continue;
+            
+            //if we found our shell
+            if (piece.getType() == Piece.TYPE_SHELL_TOP)
+                return true;
+        }
+        
+        //no destroyed top shells were found
+        return false;
+    }
+    
+    /**
      * Get the count of destroyed pieces
      * @param pieces List of pieces to check
      * @return The total number of pieces flagged as destroyed

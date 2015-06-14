@@ -1,13 +1,14 @@
 package com.gamesbykevin.yoshi.player;
 
 import com.gamesbykevin.framework.util.Timers;
+
 import com.gamesbykevin.yoshi.board.Board;
 import com.gamesbykevin.yoshi.board.BoardHelper;
 import com.gamesbykevin.yoshi.engine.Engine;
 import com.gamesbykevin.yoshi.entity.Entity;
 import com.gamesbykevin.yoshi.player.stats.Stats;
-import com.gamesbykevin.yoshi.shared.IElement;
 import com.gamesbykevin.yoshi.player.stats.Stat;
+import com.gamesbykevin.yoshi.shared.IElement;
 
 import java.awt.Font;
 import java.awt.Graphics;

@@ -1,8 +1,8 @@
 package com.gamesbykevin.yoshi.player;
 
 import com.gamesbykevin.framework.input.Keyboard;
-import com.gamesbykevin.yoshi.board.BoardHelper;
 
+import com.gamesbykevin.yoshi.board.BoardHelper;
 import com.gamesbykevin.yoshi.engine.Engine;
 
 import java.awt.Graphics;

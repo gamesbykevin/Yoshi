@@ -4,8 +4,8 @@ import com.gamesbykevin.framework.util.*;
 
 import com.gamesbykevin.yoshi.board.Board;
 import com.gamesbykevin.yoshi.board.BoardHelper;
-import com.gamesbykevin.yoshi.engine.Engine;
 import com.gamesbykevin.yoshi.board.piece.Piece;
+import com.gamesbykevin.yoshi.engine.Engine;
 
 import java.awt.Image;
 import java.util.ArrayList;

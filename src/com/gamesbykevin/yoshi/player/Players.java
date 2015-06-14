@@ -1,9 +1,11 @@
 package com.gamesbykevin.yoshi.player;
 
 import com.gamesbykevin.framework.util.Timers;
+
 import com.gamesbykevin.yoshi.board.BoardHelper;
 import com.gamesbykevin.yoshi.engine.Engine;
 import com.gamesbykevin.yoshi.entity.Entity;
+import com.gamesbykevin.yoshi.resources.GameAudio.Keys;
 import com.gamesbykevin.yoshi.shared.IElement;
 
 import java.awt.Font;
@@ -27,6 +29,16 @@ public final class Players implements IElement
     public static final int MODE_VS_CLEAR_BOARD = 2;
     public static final int MODE_VS_ATTACK = 3;
     public static final int MODE_SINGLE_PLAYER_CPU = 4;
+    
+    //the different yoshi sizes
+    private static final int YOSHI_SIZE_0 = 2;
+    private static final int YOSHI_SIZE_1 = 3;
+    private static final int YOSHI_SIZE_2 = 4;
+    private static final int YOSHI_SIZE_3 = 5;
+    private static final int YOSHI_SIZE_4 = 6;
+    private static final int YOSHI_SIZE_5 = 7;
+    private static final int YOSHI_SIZE_6 = 8;
+    private static final int YOSHI_SIZE_7 = 9;
     
     //the delay for high score mode (3 minutes)
     private static final long MODE_HIGH_SCORE_DELAY = Timers.toNanoSeconds(3);
@@ -287,6 +299,21 @@ public final class Players implements IElement
         if (hasGameOver())
             return;
         
+        //the different sound effects to check for
+        boolean createYoshi0 = false;
+        boolean createYoshi1 = false;
+        boolean createYoshi2 = false;
+        boolean createYoshi3 = false;
+        boolean createYoshi4 = false;
+        boolean createYoshi5 = false;
+        boolean createYoshi6 = false;
+        boolean createYoshi7 = false;
+        boolean piecesMatch = false;
+        boolean playerMove = false;
+        boolean placePiece = false;
+        boolean swapColumn = false;
+        boolean placeTopShell = false;
+        
         for (int i = 0; i < players.size(); i++)
         {
             //get the current player
@@ -296,8 +323,90 @@ public final class Players implements IElement
             if (player.getBoard().hasGameOver())
                 continue;
             
+            //check the players column
+            final int col = (int)player.getCol();
+            
+            //check if we are swapping columns
+            final boolean swappingColumns = BoardHelper.isSwappingColumns(player.getBoard().getPieces());
+            
+            //check if we have a yoshi
+            final boolean hasYoshi = BoardHelper.hasYoshi(player.getBoard().getPieces());
+            
+            //check if we have destoryed pieces
+            final boolean destroyedPiece = BoardHelper.hasDestroyedPieces(player.getBoard().getPieces());
+            
+            //check for falling pieces
+            final boolean fallingPieces = BoardHelper.hasFallingPieces(player.getBoard().getPieces());
+            
             //update the player
             player.update(engine);
+            
+            //if the columns are different the player moved
+            if (col != (int)player.getCol())
+                playerMove = true;
+            
+            //if we are now swapping a column, play sound
+            if (!swappingColumns && BoardHelper.isSwappingColumns(player.getBoard().getPieces()))
+                swapColumn = true;
+            
+            //if we have a destroyed piece, check if the piece is a top sell
+            if (!destroyedPiece && BoardHelper.hasDestroyedPieces(player.getBoard().getPieces()))
+            {
+                //if the top shell is destroyed
+                if (BoardHelper.hasDestroyedTopShell(player.getBoard().getPieces()))
+                {
+                    placeTopShell = true;
+                }
+                else
+                {
+                    piecesMatch = true;
+                }
+            }
+            
+            //if pieces are no longer falling
+            if (fallingPieces && !BoardHelper.hasFallingPieces(player.getBoard().getPieces()))
+                placePiece = true;
+            
+            //if we now have a yoshi
+            if (!hasYoshi && BoardHelper.hasYoshi(player.getBoard().getPieces()))
+            {
+                //check the size to determine which sound to play
+                switch (BoardHelper.getYoshiSize(player.getBoard().getPieces()))
+                {
+                    case YOSHI_SIZE_0:
+                        createYoshi0 = true;
+                        break;
+                        
+                    case YOSHI_SIZE_1:
+                        createYoshi1 = true;
+                        break;
+                        
+                    case YOSHI_SIZE_2:
+                        createYoshi2 = true;
+                        break;
+                        
+                    case YOSHI_SIZE_3:
+                        createYoshi3 = true;
+                        break;
+                        
+                    case YOSHI_SIZE_4:
+                        createYoshi4 = true;
+                        break;
+                        
+                    case YOSHI_SIZE_5:
+                        createYoshi5 = true;
+                        break;
+                        
+                    case YOSHI_SIZE_6:
+                        createYoshi6 = true;
+                        break;
+                        
+                    case YOSHI_SIZE_7:
+                        createYoshi7 = true;
+                        break;
+                }
+            }
+            
             
             //check the players according to the game mode
             switch (getModeIndex())
@@ -354,6 +463,34 @@ public final class Players implements IElement
                     break;
             }
         }
+        
+        //play the appropriate sound effects
+        if (createYoshi0)
+            engine.getResources().playGameAudio(Keys.CreateYoshi0);
+        if (createYoshi1)
+            engine.getResources().playGameAudio(Keys.CreateYoshi1);
+        if (createYoshi2)
+            engine.getResources().playGameAudio(Keys.CreateYoshi2);
+        if (createYoshi3)
+            engine.getResources().playGameAudio(Keys.CreateYoshi3);
+        if (createYoshi4)
+            engine.getResources().playGameAudio(Keys.CreateYoshi4);
+        if (createYoshi5)
+            engine.getResources().playGameAudio(Keys.CreateYoshi5);
+        if (createYoshi6)
+            engine.getResources().playGameAudio(Keys.CreateYoshi6);
+        if (createYoshi7)
+            engine.getResources().playGameAudio(Keys.CreateYoshi7);
+        if (piecesMatch)
+            engine.getResources().playGameAudio(Keys.MatchPieces);
+        if (playerMove)
+            engine.getResources().playGameAudio(Keys.MovePlayer);
+        if (placePiece)
+            engine.getResources().playGameAudio(Keys.PlacePiece);
+        if (swapColumn)
+            engine.getResources().playGameAudio(Keys.SwapColumns);
+        if (placeTopShell)
+            engine.getResources().playGameAudio(Keys.TopShellPlaced);
         
         //only check when playing an opponent
         if (isMultiPlayer())
