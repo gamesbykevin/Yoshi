@@ -309,11 +309,18 @@ public final class Board extends Sprite implements IElement
         //if no pieces are falling, drop the starting pieces at the top
         if (!BoardHelper.hasFallingPieces(getPieces()))
         {
-            //drop the starting pieces
-            BoardHelper.dropStartingPieces(getPieces());
-            
-            //no need to continue
-            return;
+            /**
+             * Even though we don't have falling pieces let make sure any existing pieces are finished.
+             * Finished meaning that there aren't any yoshi's or destroyed
+             */
+            if (!BoardHelper.hasExistingPieces(getPieces()))
+            {
+                //drop the starting pieces
+                BoardHelper.dropStartingPieces(getPieces());
+
+                //no need to continue
+                return;
+            }
         }
         
         //if there are pieces that are destroyed we need to handle those
@@ -373,17 +380,15 @@ public final class Board extends Sprite implements IElement
              */
             for (int i = 0; i < getPieces().size(); i++)
             {
-                //we only want to create 1 yoshi at a time, so if 1 is found we will exit
-                if (BoardHelper.hasYoshi(getPieces()))
-                {
-                    break;
-                }
-                
                 //get the current piece
                 final Piece piece = getPieces().get(i);
 
                 //update the piece
                 BoardHelper.updatePiece(piece, this, engine.getMain().getTime(), applyGravity);
+                
+                //we only want to create 1 yoshi at a time, so if 1 is found we will exit
+                if (BoardHelper.hasYoshi(getPieces()))
+                    break;
             }
         }
         
@@ -391,8 +396,6 @@ public final class Board extends Sprite implements IElement
         if (BoardHelper.hasLosingBoard(getPieces()))
             setGameResult(true);
     }
-    
-    
     
     @Override
     public void render(final Graphics graphics) throws Exception

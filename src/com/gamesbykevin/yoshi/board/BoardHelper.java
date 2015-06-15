@@ -105,7 +105,7 @@ public final class BoardHelper
     /**
      * Is there a top shell marked destroyed?
      * @param pieces List of pieces to check
-     * @return true if a top shell is flagged destroyed, false otherwis
+     * @return true if a top shell is flagged destroyed, false otherwise
      */
     public static boolean hasDestroyedTopShell(final List<Piece> pieces)
     {
@@ -214,8 +214,8 @@ public final class BoardHelper
             //get the current piece
             final Piece piece = pieces.get(i);
             
-            //we don't want these pieces
-            if (piece.isPlaced() || piece.isYoshi() || piece.isDestroyed() || piece.isFrozen())
+            //we don't want these pieces because they can't fall
+            if (piece.isPlaced() || piece.isDestroyed() || piece.isFrozen())
                 continue;
             
             //if none of the above is true, we have a falling piece
@@ -251,6 +251,27 @@ public final class BoardHelper
     }
     
     /**
+     * Check if we have any existing pieces that need to finish
+     * @param pieces List of pieces to check
+     * @return true if we have at least 1 piece that is a yoshi or destroyed, false otherwise
+     */
+    public static boolean hasExistingPieces(final List<Piece> pieces)
+    {
+        for (int i = 0; i < pieces.size(); i++)
+        {
+            //get the current piece
+            final Piece piece = pieces.get(i);
+            
+            //if yoshi or destroyed, we have existing pieces
+            if (piece.isYoshi() || piece.isDestroyed())
+                return true;
+        }
+        
+        //none were found
+        return false;
+    }
+    
+    /**
      * Check if we have any pieces at the starting position
      * @param pieces List of pieces to check.
      * @return true if we have at least 1 piece in row 0, false otherwise
@@ -259,7 +280,11 @@ public final class BoardHelper
     {
         for (int i = 0; i < pieces.size(); i++)
         {
-            if ((int)pieces.get(i).getRow() == 0)
+            //get the current piece
+            final Piece piece = pieces.get(i);
+            
+            //if we are at the first row and the piece is frozen, we have a starting piece
+            if ((int)piece.getRow() == 0)
                 return true;
         }
         
