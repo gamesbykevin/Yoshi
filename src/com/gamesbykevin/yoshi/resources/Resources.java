@@ -134,7 +134,7 @@ public class Resources implements IResources
     
     /**
      * Checks to see if audio is turned on
-     * @return 
+     * @return true=yes, false=no
      */
     public boolean isAudioEnabled()
     {

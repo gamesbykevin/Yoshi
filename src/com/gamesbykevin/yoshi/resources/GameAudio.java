@@ -19,7 +19,9 @@ public final class GameAudio extends AudioManager
         CreateYoshi0, CreateYoshi1, CreateYoshi2, CreateYoshi3,
         CreateYoshi4, CreateYoshi5, CreateYoshi6, CreateYoshi7,
         MatchPieces, MovePlayer, PlacePiece, 
-        SwapColumns, TopShellPlaced
+        SwapColumns, TopShellPlaced,
+        
+        MusicPlayer1, MusicPlayer2, GameOver
     }
     
     public GameAudio() throws Exception

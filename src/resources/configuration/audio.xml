@@ -16,4 +16,7 @@
     <sound id="PlacePiece">resources/audio/game/sfx/placePiece.wav</sound>
     <sound id="SwapColumns">resources/audio/game/sfx/swapColumns.wav</sound>
     <sound id="TopShellPlaced">resources/audio/game/sfx/topShellPlaced.wav</sound>
+    <sound id="MusicPlayer1">resources/audio/game/music/player1.mp3</sound>
+    <sound id="MusicPlayer2">resources/audio/game/music/player2.mp3</sound>
+    <sound id="GameOver">resources/audio/game/music/gameover.mp3</sound>
 </sounds>

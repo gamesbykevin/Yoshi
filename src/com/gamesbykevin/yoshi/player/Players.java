@@ -52,6 +52,9 @@ public final class Players implements IElement
     //is the game over
     private boolean gameover = false;
     
+    //flag this once music has started playing
+    private boolean musicPlay = false;
+    
     /**
      * Create our players container
      * @param modeIndex The game mode we are playing
@@ -251,9 +254,6 @@ public final class Players implements IElement
                 this.gameover = true;
             }
         }
-        
-        //none of the games are over
-        this.gameover = false;
     }
     
     /**
@@ -299,6 +299,16 @@ public final class Players implements IElement
         if (hasGameOver())
             return;
         
+        //have we started the music
+        if (!musicPlay)
+        {
+            //play the appropriate sound in a loop
+            engine.getResources().playGameAudio(isMultiPlayer() ? Keys.MusicPlayer2 : Keys.MusicPlayer1, true);
+            
+            //flag that we have started the music
+            musicPlay = true;
+        }
+        
         //the different sound effects to check for
         boolean createYoshi0 = false;
         boolean createYoshi1 = false;
@@ -340,6 +350,10 @@ public final class Players implements IElement
             
             //update the player
             player.update(engine);
+            
+            //if this player has a game over, flag it
+            if (player.getBoard().hasGameOver())
+                checkGameOver();
             
             //if the columns are different the player moved
             if (col != (int)player.getCol())
@@ -497,6 +511,16 @@ public final class Players implements IElement
         {
             //check if the game is over
             checkGameOver();
+        }
+        
+        //if the game ended
+        if (hasGameOver())
+        {
+            //stop all sound
+            engine.getResources().stopAllSound();
+
+            //play game over tune
+            engine.getResources().playGameAudio(Keys.GameOver);
         }
     }
     
