@@ -437,7 +437,7 @@ public final class Players implements IElement
                 case MODE_VS_CLEAR_BOARD:
                     
                     //if the board is cleared, flag winner
-                    if (!BoardHelper.hasPlacedPieces(player.getBoard()))
+                    if (!BoardHelper.hasPlacedPieces(player.getBoard().getPieces()))
                         this.flagGameOverWin(player);
                     break;
                     

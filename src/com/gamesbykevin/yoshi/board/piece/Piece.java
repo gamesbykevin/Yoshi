@@ -1,6 +1,5 @@
 package com.gamesbykevin.yoshi.board.piece;
 
-import com.gamesbykevin.framework.base.Animation;
 import com.gamesbykevin.framework.util.Timers;
 
 import com.gamesbykevin.yoshi.board.BoardHelper;
@@ -61,7 +60,7 @@ public final class Piece extends Entity
     /**
      * The speed at which we switch columns
      */
-    public static final double SWAP_COLUMN_RATE = .1;
+    public static final double SWAP_COLUMN_RATE = 0.1;
     
     /**
      * For when we aren't looking for a piece by the id
@@ -89,7 +88,7 @@ public final class Piece extends Entity
     //the target column, used when switching columns
     private double targetCol = 0;
     
-    public Piece(final int type)
+    public Piece(final int type) throws Exception
     {
         super();
         
@@ -145,6 +144,8 @@ public final class Piece extends Entity
                 addAnimation(ANIMATION_KEY_CREATE_YOSHI_LARGE,  0, 628, 63, 81, 6, DELAY_YOSHI_CREATE, DELAY_YOSHI_CREATE_LAST, false);
                 break;
                 
+            default:
+                throw new Exception("Type not found here " + type);
         }
         
         //assign the default animation

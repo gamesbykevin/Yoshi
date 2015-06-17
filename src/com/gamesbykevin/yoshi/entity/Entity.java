@@ -103,18 +103,25 @@ public abstract class Entity extends Sprite
      */
     protected void addAnimation(final Object key, final int x, final int y, final int w, final int h, final int count, final long delay, final long lastDelay, final boolean loop)
     {
-        //create a new animation
-        Animation animation = new Animation();
-        
-        //set the loop
-        animation.setLoop(loop);
+        //single animation
+        Animation animation = null;
         
         //add all the animations
         for (int i=0; i < count; i++)
         {
-            //set correct delay depending on the index
-            animation.add(x + (i * w), y, w, h, (i < count - 1) ? delay : lastDelay);
+            if (animation == null)
+            {
+                animation = new Animation(x + (i * w), y, w, h, (i < count - 1) ? delay : lastDelay);
+            }
+            else
+            {
+                //set correct delay depending on the index
+                animation.add(x + (i * w), y, w, h, (i < count - 1) ? delay : lastDelay);
+            }
         }
+        
+        //set the loop
+        animation.setLoop(loop);
         
         //add animation to spritesheet
         super.getSpriteSheet().add(animation, key);

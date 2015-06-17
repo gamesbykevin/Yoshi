@@ -37,6 +37,11 @@ public final class Main extends Thread implements Disposable
     //need double for accuracy
     private double nanoSecondsPerUpdate;
     
+    /**
+     * The minimum updates per second allowed.
+     */
+    public static final int UPS_MINIMUM = 1;
+    
     //reference to our applet
     private JApplet applet;
     
@@ -65,11 +70,14 @@ public final class Main extends Thread implements Disposable
     
     /**
      * Main class that manages the game engine
-     * 
-     * @param ups Desired updates per second
+     * @param ups Updates per second
      */
-    private Main(final int ups)
+    private Main(int ups)
     {
+        //make sure valid ups is entered
+        if (ups < UPS_MINIMUM)
+            ups = UPS_MINIMUM;
+        
         //the dimensions used for original/full screen
         originalSizeWindow = new Rectangle(0, 0, Shared.ORIGINAL_WIDTH, Shared.ORIGINAL_HEIGHT);
         fullSizeWindow     = new Rectangle(originalSizeWindow);
@@ -106,6 +114,11 @@ public final class Main extends Thread implements Disposable
         {
             engine.dispose();
             engine = null;
+        }
+        
+        if (applet != null)
+        {
+            applet = null;
         }
         
         if (panel != null)

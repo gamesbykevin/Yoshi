@@ -73,15 +73,15 @@ public final class BoardHelper
     
     /**
      * Does this board have any placed pieces
-     * @param board The board we want to check
+     * @param pieces List of pieces to check
      * @return true if at least 1 piece is placed, false otherwise
      */
-    public static boolean hasPlacedPieces(final Board board)
+    public static boolean hasPlacedPieces(final List<Piece> pieces)
     {
-        for (int i = 0; i < board.getPieces().size(); i++)
+        for (int i = 0; i < pieces.size(); i++)
         {
             //get the current piece
-            final Piece piece = board.getPieces().get(i);
+            final Piece piece = pieces.get(i);
             
             //if any piece is placed, yoshi, or destoryed, there are placed pieces
             if (piece.isPlaced() || piece.isYoshi() || piece.isDestroyed())
@@ -154,7 +154,7 @@ public final class BoardHelper
      * @param board The board we are adding pieces to
      * @param random Object used to make random decisions
      */
-    public static void populateBoard(final Board board, final Random random)
+    public static void populateBoard(final Board board, final Random random) throws Exception
     {
         //create new list of options
         List<Integer> options = new ArrayList<>();
@@ -182,20 +182,20 @@ public final class BoardHelper
                 
                 //create a random piece of type
                 Piece piece = new Piece(options.get(random.nextInt(options.size())));
-                
+
                 //set the location
                 piece.setCol(col);
                 piece.setRow(row);
-                
+
                 //mark the piece as placed
                 piece.placePiece();
-                
+
                 //set the y-coordinate
                 piece.setY(board.getStartPieceRowY() + (row * (DROP_PIXEL_DISTANCE * 2)));
 
                 //set the x-coordinate
                 piece.setX(board.getStartPieceColumnX() + (col * BoardHelper.COLUMN_PIXEL_WIDTH));
-                
+
                 //add piece to the board
                 board.add(piece);
             }
@@ -297,7 +297,7 @@ public final class BoardHelper
      * @param board The board we want to add the pieces to
      * @param random Object used to make random decisions
      */
-    public static void spawnPieces(final Board board, final Random random)
+    public static void spawnPieces(final Board board, final Random random) throws Exception
     {
         //the optional columns to choose from
         final List<Integer> options = new ArrayList<>();
