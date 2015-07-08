@@ -19,5 +19,5 @@ public interface IPlayer
     /**
      * Each player will need to setup their animations
      */
-    public void setupAnimations();
+    public void setupAnimations() throws Exception;
 }

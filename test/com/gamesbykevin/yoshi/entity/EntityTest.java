@@ -56,7 +56,7 @@ public class EntityTest
     }
     
     @Test
-    public void addAnimationTest() 
+    public void addAnimationTest() throws Exception
     {
         final String key = "key";
         
@@ -68,7 +68,7 @@ public class EntityTest
     }
     
     @Test
-    public void adjustDimensionsTest() 
+    public void adjustDimensionsTest() throws Exception
     {
         entity = new MyEntity();
         entity.addAnimation("key", 0, 0, 25, 35, 3, 0, true);
@@ -88,7 +88,7 @@ public class EntityTest
     }
     
     @Test
-    public void hasAnimationFinishedTest()
+    public void hasAnimationFinishedTest() throws Exception
     {
         entity = new MyEntity();
         entity.addAnimation("key", 0, 0, 25, 35, 3, 0, true);
@@ -102,7 +102,7 @@ public class EntityTest
     }
     
     @Test
-    public void setAnimationTest()
+    public void setAnimationTest() throws Exception
     {
         final String key1 = "key1";
         final String key2 = "key2";

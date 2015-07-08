@@ -322,7 +322,7 @@ public abstract class Player extends Entity implements IElement, IPlayer
      * We will also display the win/lost animation.
      * @param lose True if the player controlling this board lost, false if they won
      */
-    public void setGameResult(final boolean lose)
+    public void setGameResult(final boolean lose) throws Exception
     {
         //update the result on the board
         getBoard().setGameResult(lose);

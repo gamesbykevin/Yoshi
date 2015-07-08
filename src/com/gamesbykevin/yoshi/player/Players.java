@@ -231,7 +231,7 @@ public final class Players implements IElement
         }
     }
     
-    private void checkGameOver()
+    private void checkGameOver() throws Exception
     {
         for (int i = 0; i < players.size(); i++)
         {
@@ -262,7 +262,7 @@ public final class Players implements IElement
      * The specified player will be the player who won, the other player(s) will lose
      * @param player The player who won
      */
-    private void flagGameOverWin(final Player player)
+    private void flagGameOverWin(final Player player) throws Exception
     {
         for (int i = 0; i < players.size(); i++)
         {
@@ -280,7 +280,7 @@ public final class Players implements IElement
      * The specified player will be the player who lost, the other player(s) will win
      * @param player The player who lost
      */
-    private void flagGameOverLose(final Player player)
+    private void flagGameOverLose(final Player player) throws Exception
     {
         for (int i = 0; i < players.size(); i++)
         {

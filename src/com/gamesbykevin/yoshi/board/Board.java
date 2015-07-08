@@ -12,6 +12,7 @@ import com.gamesbykevin.yoshi.shared.IElement;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The board the player will play on
@@ -230,7 +231,7 @@ public final class Board extends Sprite implements IElement
      * @param id The unique key identifying the piece we don't want to check
      * @return The piece at the specified location. If not found null is returned.
      */
-    public Piece getPiece(final double col, final double row, final long id)
+    public Piece getPiece(final double col, final double row, final UUID id)
     {
         for (int i = 0; i < getPieces().size(); i++)
         {
@@ -238,7 +239,7 @@ public final class Board extends Sprite implements IElement
             final Piece piece = getPieces().get(i);
             
             //make sure we aren't checking our own piece
-            if (piece.getId() != id)
+            if (id == null || piece.getId() != id)
             {
                 //if the location matches, get the piece
                 if (piece.equals(col, row))

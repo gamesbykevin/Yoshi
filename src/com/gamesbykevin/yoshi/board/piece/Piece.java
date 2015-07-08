@@ -7,6 +7,7 @@ import com.gamesbykevin.yoshi.entity.Entity;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.util.UUID;
 
 /**
  * Each cell on the board is a piece
@@ -65,7 +66,7 @@ public final class Piece extends Entity
     /**
      * For when we aren't looking for a piece by the id
      */
-    public static final long NO_ID = -1;
+    public static final UUID NO_ID = null;
     
     //the type of piece (goomba, plant, shell top, etc...)
     private final int type;
@@ -217,7 +218,7 @@ public final class Piece extends Entity
      * Place the piece at the current location.<br>
      * We will freeze the piece as well as change the animation
      */
-    public void placePiece()
+    public void placePiece() throws Exception
     {
         //stop dropping piece
         setPlaced(true);
@@ -242,7 +243,7 @@ public final class Piece extends Entity
      * Mark the piece destroyed.<br>
      * We will also set the destroyed animation.
      */
-    public void markDestroyed()
+    public void markDestroyed() throws Exception
     {
         //flag destroyed
         this.destroyed = true;

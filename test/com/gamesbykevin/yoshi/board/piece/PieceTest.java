@@ -47,7 +47,7 @@ public class PieceTest
         assertTrue(Piece.YOSHI_SIZE_LARGE == 9);
         
         //assume value will not change
-        assertTrue(Piece.NO_ID == -1);
+        assertTrue(Piece.NO_ID == null);
         
         //assume this will be a nice convenient number
         assertTrue((int)(1 % Piece.SWAP_COLUMN_RATE) == 0);

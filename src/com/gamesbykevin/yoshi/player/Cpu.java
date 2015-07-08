@@ -92,7 +92,7 @@ public final class Cpu extends Player
     }
     
     @Override
-    public void setupAnimations()
+    public void setupAnimations() throws Exception
     {
         super.addAnimation(Player.ANIMATION_KEY_ROTATE_BACK,  0,   80,   120, 40,  5, DELAY_DEFAULT, false);
         super.addAnimation(Player.ANIMATION_KEY_ROTATE_FRONT, 0,   120,  120, 40,  5, DELAY_DEFAULT, false);

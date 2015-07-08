@@ -28,7 +28,7 @@ public abstract class Entity extends Sprite
     /**
      * Reset the current animation
      */
-    public void resetAnimation()
+    public void resetAnimation() throws Exception
     {
         super.getSpriteSheet().reset();
     }
@@ -38,7 +38,7 @@ public abstract class Entity extends Sprite
      * Also make sure we set the appropriate dimension
      * @param key The key of the animation
      */
-    public void setAnimation(final Object key)
+    public void setAnimation(final Object key) throws Exception
     {
         super.getSpriteSheet().setCurrent(key);
         
@@ -50,7 +50,7 @@ public abstract class Entity extends Sprite
      * Has the current animation finished
      * @return true=yes, false=no
      */
-    public boolean hasAnimationFinished()
+    public boolean hasAnimationFinished() throws Exception
     {
         return super.getSpriteSheet().hasFinished();
     }
@@ -67,7 +67,7 @@ public abstract class Entity extends Sprite
     /**
      * Set the width/height based on the current animation frame
      */
-    public void adjustDimensions()
+    public void adjustDimensions() throws Exception
     {
         //set the width/height
         super.setDimensions(super.getSpriteSheet().getLocation());
@@ -84,7 +84,7 @@ public abstract class Entity extends Sprite
      * @param delay time delay for each animation (nanoseconds)
      * @param loop do we loop animation
      */
-    protected void addAnimation(final Object key, final int x, final int y, final int w, final int h, final int count, final long delay, final boolean loop)
+    protected void addAnimation(final Object key, final int x, final int y, final int w, final int h, final int count, final long delay, final boolean loop) throws Exception
     {
         addAnimation(key, x, y, w, h, count, delay, delay, loop);
     }
@@ -101,7 +101,7 @@ public abstract class Entity extends Sprite
      * @param lastDelay time delay for last animation frame (nanoseconds)
      * @param loop do we loop animation
      */
-    protected void addAnimation(final Object key, final int x, final int y, final int w, final int h, final int count, final long delay, final long lastDelay, final boolean loop)
+    protected void addAnimation(final Object key, final int x, final int y, final int w, final int h, final int count, final long delay, final long lastDelay, final boolean loop) throws Exception
     {
         //single animation
         Animation animation = null;
