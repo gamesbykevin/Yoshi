@@ -224,11 +224,7 @@ public final class Stats implements IElement
             stats = null;
         }
         
-        if (timer != null)
-        {
-            timer.dispose();
-            timer = null;
-        }
+        timer = null;
     }
     
     /**

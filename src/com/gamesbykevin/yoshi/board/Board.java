@@ -158,11 +158,7 @@ public final class Board extends Sprite implements IElement
     @Override
     public void dispose()
     {
-        if (timer != null)
-        {
-            timer.dispose();
-            timer = null;
-        }
+        timer = null;
         
         if (pieces != null)
         {
